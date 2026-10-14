@@ -205,3 +205,48 @@ analysis counts rows. Early-stopped runs are therefore counted as one epoch
 shorter than they ran. This applies to every arm, so differences between arms
 are essentially unaffected. Reproduced in `loss_parameters.csv` for
 comparability; `epoch_log.csv` has the complete record (D8).
+
+---
+
+## E9. PAPILA image count: 486, not 438 — CONFIRMED (text)
+
+*Found 2026-10-14 (dataset check, docs/records/datasets_2026-10-14.txt).*
+
+Paper: "438 full-color fundus images in a 238/146/51/51 train/test/calibration/
+validation split". 238 + 146 + 51 + 51 = 486, and the split CSV used has 486 rows
+with exactly those counts. **Action:** correct 438 → 486 in the erratum.
+
+---
+
+## E10. GA split sizes: 40 train / 50 test in the data, "50/40" in the text — CONFIRMED (text)
+
+*Found 2026-10-14.*
+
+Paper: "110 fundus autofluorescence (FAF) images from 73 patients … in a
+50/40/10/10 train/test/calibration/validation split". The split CSV used
+(`ga_dataset_train_val_test_cal.csv`, identical splits in the Alpine copy) has
+**train 40, test 50**, cal 10, val 10. The data are what ran; the text swaps train
+and test. **Action:** correct the sentence. The re-runs use the CSV as is.
+
+---
+
+## E11. Splits were made per image, not per patient — CONFIRMED (limitation)
+
+*Found 2026-10-14.*
+
+- **GA:** 110 images from 73 patients (patient ID read from the file name,
+  `_Final_<site>_<patient>_…`; the count matches the paper's 73).
+  **23 of 73 patients** have images in more than one split (e.g. one patient in
+  train, cal and test).
+- **Cup (PAPILA):** 486 images from 244 patients (`RET<id>OD/OS`).
+  **140 of 244 patients** have their two eyes in different splits.
+
+Images of the same patient (fellow eyes, repeat visits) are correlated, so test
+scores are optimistic, and calibration/test images share patients with training,
+which weakens the exchangeability conformal prediction relies on. The paper does
+not claim patient-level splits, so this is a limitation to disclose, not a
+misstatement. Baseline and UAT arms share the same splits, so the comparison
+between them is not biased by it in an obvious direction.
+**Action:** disclose in the erratum. The re-runs keep the original splits (to
+reproduce what ran); a patient-level re-split is a planned sensitivity analysis.
+FAZ (OCTA-500) to be checked once its split file is found.

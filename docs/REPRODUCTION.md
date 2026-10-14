@@ -56,7 +56,9 @@ scripts/run_local.sh jobs/smoke.jsonl 0
 ls results/smoke/cup/*/weighted_bce_v2/*/*/*/run_1/test_metrics.txt   # expect 8
 ```
 
-Use the `seconds` column of any `epoch_log.csv` to estimate the cost of steps 3-5.
+Use the `seconds` and `peak_gpu_gb` columns of the `epoch_log.csv` files to
+estimate the cost of steps 3-5 and how many runs fit side by side on one GPU
+(batch size stays 1, as in the paper; parallelism comes from concurrent runs).
 
 ## 3. Parity: SAM ViT-H, paper's configurations (260 runs)
 

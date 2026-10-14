@@ -22,7 +22,13 @@ compared with parity, or by grid code (K7).
 The grid code must have differed. Our evaluation uses the variance map at test
 time. **Resolve by:** grid code (K7). Low impact on the main claims.
 
-### K4. Are MedSAM's three multimask tokens meaningful? — OPEN, check first
+### K4. Are MedSAM's three multimask tokens meaningful? — RESOLVED 2026-10-14: yes
+`docs/records/inspect_medsam.json` (8 cup training images, pretrained weights):
+mean variance across the three tokens 0.055 (SAM ViT-H: 0.082), mean absolute
+difference between tokens 0.15 (0↔1) and 0.33 (0↔2). The outputs are distinct, so
+the variance arm is meaningful on MedSAM.
+
+Original note:
 As far as we know, MedSAM was fine-tuned with single-mask output, so its three
 multimask tokens may be essentially SAM's weights. The variance arm on MedSAM
 may then behave very differently (near-zero or degenerate variance).
@@ -34,7 +40,13 @@ run and reported, with this explanation.
 ERRATA E6. **Resolve by:** paper-era GA conformal_lac_005 run folders (do they
 end in a crash at the first calibration?).
 
-### K6. Are the split CSVs the paper's? — MUST CHECK FIRST
+### K6. Are the split CSVs the paper's? — RESOLVED for cup and GA (2026-10-14); FAZ OPEN
+Cup and GA: path-corrected copies of the paper-era CSVs; every surviving copy has
+identical split assignments; counts as in the data (see ERRATA E9, E10); all files
+present; masks binary. SHA-256 in `docs/records/datasets_2026-10-14.txt`. FAZ split
+file not yet found.
+
+Original note:
 **Resolve by:** `scripts/check_datasets.py` (counts must equal the paper's;
 records SHA-256 of each CSV). Without the original splits this is not the same
 experiment.
@@ -61,7 +73,14 @@ The code that logged `val_uncertainty` is lost. We log the mean of the
 uncertainty map over validation images, for epochs after warmup only (Figure 7's
 curves start after warmup). Check against the paper-era CSVs if found (K7).
 
-### K10. MedSAM preprocessing differs from SAM's? — CHECK
+### K10. MedSAM preprocessing differs from SAM's? — RESOLVED 2026-10-14: no
+`wanglab/medsam-vit-base`'s processor is identical to `facebook/sam-vit-huge`'s
+(longest edge 1024, pad to 1024, rescale 1/255, ImageNet mean/std, RGB).
+So the paper-era use of SAM's processor did not change the preprocessing. Note:
+the original MedSAM code base normalizes intensities min-max to [0, 1]; we use the
+Hugging Face port and its processor, as stated in DECISIONS D10.
+
+Original note:
 The paper-era code used SAM's processor. We use each backbone's own processor.
 `inspect_backbone.py` records both; document the difference in the erratum if
 there is one.

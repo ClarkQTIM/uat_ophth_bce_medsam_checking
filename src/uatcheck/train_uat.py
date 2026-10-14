@@ -184,6 +184,8 @@ def train_one_run(cfg_in):
     for epoch in range(int(cfg["num_epochs"])):
         t0 = time.time()
         active = uq != "none" and epoch >= W
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
 
         # ---------------- train ----------------
         model.train()
@@ -236,6 +238,8 @@ def train_one_run(cfg_in):
             "val_uncertainty": float(np.mean(va_u)) if va_u else float("nan"),
             "val_soft_dice": float(np.mean(va_dice)) if va_dice else float("nan"),
             "seconds": round(time.time() - t0, 1),
+            "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1024 ** 3, 2)
+                           if torch.cuda.is_available() else float("nan"),
         }
 
         # ---------------- early stopping (paper-era logic) ----------------
@@ -250,7 +254,8 @@ def train_one_run(cfg_in):
         pd.DataFrame(epoch_rows).to_csv(os.path.join(run_dir, "epoch_log.csv"), index=False)
         print(f"[epoch {epoch + 1}] train {tr_loss:.4f} | val {va_loss:.4f} | "
               f"val dice {row['val_soft_dice']:.4f} | U {row['val_uncertainty']:.4g} | "
-              f"patience {patience_counter}/{cfg['patience']} | {row['seconds']}s")
+              f"patience {patience_counter}/{cfg['patience']} | {row['seconds']}s | "
+              f"peak GPU {row['peak_gpu_gb']} GB")
 
         if patience_counter >= int(cfg["patience"]):
             early_stopped, stopped_at = True, epoch + 1
