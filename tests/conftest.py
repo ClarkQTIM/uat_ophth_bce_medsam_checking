@@ -15,7 +15,8 @@ def tiny_sam():
     hidden = 32
     vision = SamVisionConfig(hidden_size=hidden, output_channels=hidden, num_hidden_layers=2,
                              num_attention_heads=2, image_size=256, patch_size=16,
-                             mlp_dim=64, global_attn_indexes=[1], window_size=4)
+                             mlp_dim=64, global_attn_indexes=[1], window_size=4,
+                             num_pos_feats=hidden // 2)   # positional encoding is 2*num_pos_feats wide
     prompt = SamPromptEncoderConfig(hidden_size=hidden, image_size=256, patch_size=16,
                                     mask_input_channels=8)
     decoder = SamMaskDecoderConfig(hidden_size=hidden, num_attention_heads=2, mlp_dim=64,
