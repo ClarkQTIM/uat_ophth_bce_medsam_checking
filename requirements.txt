@@ -1,0 +1,11 @@
+# Versions used for the paper-era runs are unknown; record yours in docs/records/.
+torch>=2.0
+transformers>=4.38
+monai>=1.0
+numpy
+pandas
+scipy
+scikit-learn
+pyyaml
+pillow
+pytest

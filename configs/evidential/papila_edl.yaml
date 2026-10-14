@@ -1,0 +1,13 @@
+# Evidential track (NOT yet run). See src/uatcheck/evidential/README.md.
+csv: FILL_ME/papila_two_rater_split.csv     # image, r1_disc, r1_cup, r2_disc, r2_cup, split
+backbone: medsam
+model: C                 # A (STAPLE, CE) | B (soft target, soft CE) | C (Dirichlet, EDL)
+lambda0: 1.0e-4          # primary ablation: 1e-4, 1e-3, 1e-2
+kl_scale_by_K: true      # ICMLA eq. 7
+alpha_offset: 0.0
+num_epochs: 40
+patience: 5
+batch_size: 1
+learning_rate: 1.0e-5
+weight_decay: 1.0e-5
+output_root: results/evidential

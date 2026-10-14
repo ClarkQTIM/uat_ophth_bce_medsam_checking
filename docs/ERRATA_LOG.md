@@ -1,0 +1,207 @@
+# Errata log
+
+**Paper:** Clark CW, Kinder S, Nebbia G, et al. *Uncertainty-Aware Training for
+Ophthalmic Segmentation Using MedSAM.* Transl Vis Sci Technol. 2026;15(2):19.
+doi:10.1167/tvst.15.2.19
+
+This file is the dated record of every discrepancy found between the paper and
+the code that produced it, with the evidence for each. It is written so that a
+co-author or editor can follow it without any other context.
+
+**Code versions referred to below**
+
+| Name | Location | What it is |
+|---|---|---|
+| `uat_old` | `/scratch90/chris_/uat_dice/uat_old/src` | Oldest surviving training code (`train.py`, ~1,500 lines). Learnable γ. |
+| grid code | lost (possibly on Alpine) | The code that ran the paper's fixed γ × W grid (`weighted_bce_v2`). |
+| refactor | `/scratch90/chris_/uat_dice/src` | Later modular rewrite (made with a coding assistant). Fixed γ. |
+| this repo | `paper_crisis` | Re-implementation for verification and re-runs. |
+
+**Status key:** CONFIRMED (shown directly by code or data) · LIKELY (strong
+indirect evidence; confirmation pending) · OPEN (unresolved) · NOT AN ERROR
+(documented for completeness).
+
+---
+
+## E1. The backbone was SAM ViT-H, not MedSAM — LIKELY (confirmation pending)
+
+*Found 2026-10-14.*
+
+**Paper says:** "For the foundational model to fine-tune, we used the Medical
+Segment Anything Model (MedSAM)" (Methods, Model); title "…Using MedSAM";
+"Preprocessing consists of applying the accompanying MedSAM preprocessing
+function" (Methods, Experiment).
+
+**Code shows:** every surviving version loads the original SAM, ViT-H:
+
+- `uat_old/src/train.py`, `setup_model`: `model = create_sam_model()`;
+  `processor = SamProcessor.from_pretrained("facebook/sam-vit-huge")`
+- `uat_old/src/model.py`: `def create_sam_model(pretrained_weights="facebook/sam-vit-huge", ...)`
+- `uat_old/src/train_before_080825.py`: identical.
+- refactor `src/setup.py`: `SamModel.from_pretrained("facebook/sam-vit-huge")`.
+- `--model_checkpoint` is accepted by `main.py` but never used by the training
+  function; both run scripts set `MODEL_CHECKPOINT="blank"`.
+- The only MedSAM reference, `preprocess_medsam_inputs` in `uat_old/src/data.py`
+  (loads `flaviagiammarino/medsam-vit-base`), is defined but never called.
+- Circumstantial: the paper uses batch size 1 "due to memory constraints",
+  which fits a 641M-parameter ViT-H far better than a 94M-parameter ViT-B.
+
+**Still to confirm:** the grid code is lost, so the final confirmation must come
+from a paper-era artifact: a checkpoint (≈2.5 GB / ≈641M parameters = SAM ViT-H;
+≈0.36 GB / ≈94M = MedSAM), a SLURM log with the "Deleted best model checkpoint
+(X GB)" line, or a Hugging Face download line in a log.
+
+**Impact:** title; Methods (model description, reference 18 as the model used,
+preprocessing). The paper's comparisons (UAT arm vs. baseline) are within-model:
+every arm used the same backbone, splits and settings, so the comparisons
+themselves remain internally valid — for SAM ViT-H.
+
+**Action:** erratum; re-run the paper's reported configurations with real MedSAM
+weights (`configs/errata/medsam_primary.yaml`), after a parity re-run with SAM
+ViT-H (`parity_sam.yaml`) shows the new pipeline is faithful.
+
+**Guardrail added:** `src/uatcheck/backbones.py` asserts the parameter count of
+the loaded model matches the requested backbone and records repo id, parameter
+count, and processor settings in every run's `run_manifest.json`.
+
+---
+
+## E2. The refactor's "variance" arm does not use the variance — CONFIRMED (refactor only)
+
+*Found 2026-10-14.*
+
+**Paper says:** variance = per-pixel variance of MedSAM's three outputs.
+
+**Refactor shows:** `utils.get_probabilities` computes the variance map and
+returns it as `weight_map_sam`; `epoch.py` never uses it. Instead
+`uncertainty.get_uncertainty_map("sam_var")` returns
+`compute_confidence_map(probabilities, invert=True)` = `1 − max_c p` over a
+single channel = `1 − p`, i.e. the background probability.
+
+**`uat_old` shows the paper-era behavior was correct:** `train_epoch`,
+`validate_epoch` and `test_segmentation_pipeline` only call `get_uncertainty_map`
+when `uncertainty_type != "sam_var"`; for `sam_var` the variance map from the
+forward pass is used.
+
+**The published figures agree with real variance, not with `1 − p`:**
+`1 − p` would give a mean validation uncertainty of ~0.7–0.9 (most pixels are
+confident background) and bright backgrounds in uncertainty maps. Figure 7a shows
+the variance arm at ~0.002 decaying to ~0; Figure 8's variance maps have dark
+backgrounds with structure around the lesion.
+
+**Impact:** none on the paper (as far as can be determined); any results produced
+with the refactor's `sam_var` arm are invalid.
+
+**Note (paper-era oddity, see K3):** `uat_old`'s `evaluate_model_on_test` calls
+`get_uncertainty_map` without the `sam_var` guard, and `get_uncertainty_map`
+raises for `sam_var`. So `uat_old` as it stands would crash at test time for the
+variance arm; the grid code must have differed here.
+
+**Guardrail added:** `uncertainty_map("sam_var", …)` raises if no variance map is
+supplied; `tests/test_forward_and_loop.py` checks the variance equals the variance
+of the three multimask outputs.
+
+---
+
+## E3. Three different weight formulas in the code history — OPEN (assume paper)
+
+*Found 2026-10-14.*
+
+| Source | Weight | No weighting when |
+|---|---|---|
+| Paper, Methods (Loss) | W = 1 + γU, γ ≥ 0 | γ = 0 |
+| refactor `WeightedBCELoss` ("Weighted BCE Loss V2 (Fixed Gamma)") | W = 1 + (γ − 1)U | γ = 1 |
+| `uat_old` `WeightedBCELoss` (learnable γ ∈ [0, 5]) | W = γ^U | γ = 1 |
+| commented-out older code at top of `uat_old/src/loss.py` | W = base^U | base = 1 |
+
+The grid code (`weighted_bce_v2`, fixed γ ∈ {1..5}) is lost. The refactor
+labels its class "V2" and its analysis script says "Paper used weighted_bce_v2",
+but the refactor has already been shown unfaithful once (E2).
+
+**Evidence the grid used the paper's formula:** the grid includes γ = 1; under
+either code formula every γ = 1 arm would be an exact duplicate of the baseline,
+which would be a strange grid to design. Several reported γ = 1 arms differ
+significantly from baseline (Table: FAZ Conf-0.05 (γ = 1, W = 1) converges in
+9.4 vs 17.9 epochs, P < 0.001), which is expected if they were weighted
+(W = 1 + U) and hard to explain if they were not.
+
+**Decision:** assume the paper's formula (DECISIONS D2). **Test:** K1,
+`configs/errata/gamma1_formula_check.yaml`.
+
+**Impact if the paper formula is wrong:** the equation in Methods needs
+correcting and every reported γ maps to a different effective weight; γ = 1 arms
+would be baseline replicates, and their reported differences from baseline would
+need another explanation (see E7).
+
+---
+
+## E4. Entropy normalization differs between versions — OPEN (assume paper)
+
+*Found 2026-10-14.*
+
+Paper equation and `uat_old`: natural-log binary entropy, not normalized
+(maximum ln 2 ≈ 0.693). Refactor: divided by ln 2 (maximum 1). The grid code is
+lost. Normalizing is equivalent to multiplying γ by 1/ln 2 ≈ 1.44 for the entropy
+arm only. **Decision:** paper equation (D3). Optional test: K2.
+
+---
+
+## E5. Uncertainty maps are not detached — NOT AN ERROR (undocumented property)
+
+*Found 2026-10-14.*
+
+In every version, U is computed from the model's own outputs and multiplied into
+the loss without `.detach()`, so gradients flow through U as well as through the
+BCE term. For entropy this adds a term that rewards confident (low-entropy)
+predictions; for variance it rewards agreement between the three mask tokens.
+The paper does not mention this. It is part of the method as run; the erratum
+or any follow-up should describe it. Reproduced by default
+(`detach_uncertainty: false`, D5).
+
+---
+
+## E6. GA Conf-0.05 cannot be calibrated; the Table's GA Conf-0.05 row is suspect — LIKELY
+
+*Found 2026-10-14.*
+
+The conformal threshold is a per-pixel quantile at level ⌈(n + 1)(1 − α)⌉ / n.
+GA has n_cal = 10: for α = 0.05 the level is 11/10 = 1.1 > 1 and `np.quantile`
+raises. The first calibration happens after the warmup epochs, so such a run
+trains for W epochs and then crashes.
+
+Consistent with this: Figure 5 (GA conformal ablation) has no α = 0.05 arm, and
+the Discussion mentions small datasets "that do not allow for all uncertainty
+methods". **But the Table lists "GA Conf-0.05: 5.0 epochs (−58.3%), P = 0.150".**
+That row most likely comes from runs that crashed at the first calibration, and
+should be removed. **To confirm** from the paper-era run folders (K7).
+
+---
+
+## E7. Best configurations were selected on the test set — CONFIRMED (methodological)
+
+*Found 2026-10-14.*
+
+`analysis/1_run_boxplot_analysis.py` reads the test Dice of every (γ, W) cell,
+picks the best per method, and then tests that best cell against the baseline on
+the same test data. Choosing the maximum of up to 25 cells and then testing it
+on the data used to choose it biases the comparison in favour of UAT. The size of
+the bias grows as the true differences between cells shrink.
+
+**Impact:** small for entropy-UAT, whose gains (e.g. OC ≈ 0.78 vs 0.70) are far
+larger than cell-to-cell noise; potentially material for the smaller conformal
+and variance effects. **Action:** disclose; the re-runs use the paper's reported
+cells fixed in advance (no re-selection); any new grid selects on validation
+Dice (`val_dice_at_best` is now recorded for every run; D13).
+
+---
+
+## E8. "Avg. Epochs" in the Table undercounts early-stopped runs by one — LIKELY (minor)
+
+*Found 2026-10-14.*
+
+Paper-era `train_segmentation_pipeline` breaks out of the epoch loop before
+appending the row of the epoch that triggered early stopping; the convergence
+analysis counts rows. Early-stopped runs are therefore counted as one epoch
+shorter than they ran. This applies to every arm, so differences between arms
+are essentially unaffected. Reproduced in `loss_parameters.csv` for
+comparability; `epoch_log.csv` has the complete record (D8).
