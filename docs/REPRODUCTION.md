@@ -65,7 +65,8 @@ estimate the cost of steps 3-5 and how many runs fit side by side on one GPU
 ```bash
 python scripts/make_jobs.py configs/errata/parity_sam.yaml --out jobs/parity_sam.jsonl
 sbatch --array=0-259%15 scripts/slurm_array.sbatch jobs/parity_sam.jsonl   # Alpine
-# or: scripts/run_local.sh jobs/parity_sam.jsonl <gpu> [start] [end]
+# or, on the lab server (2 SAM ViT-H runs per A100 80GB), inside tmux:
+#    scripts/run_pool.sh jobs/parity_sam.jsonl "0 0 1 1"
 python scripts/compare_arms.py --root results/errata --backbone sam_vit_huge --mode parity
 ```
 
