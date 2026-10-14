@@ -1,0 +1,12 @@
+# STEP 4 (docs/REPRODUCTION.md): the pre-registered MedSAM test for the erratum.
+# Same 26 arms as the paper, carried over UNCHANGED (no re-tuning of gamma or
+# n_warmup on MedSAM; that would be selection on the outcome).
+# Success criterion is fixed in docs/DECISIONS.md, D12, before any result is seen.
+# 26 arms x 10 runs = 260 runs.
+name: medsam_primary
+backbones: [medsam]
+runs: [1, 10]
+output_root: results/errata
+arms_file: paper_arms.yaml
+common:
+  weight_form: paper

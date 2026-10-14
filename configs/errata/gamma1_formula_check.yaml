@@ -1,0 +1,22 @@
+# KNOWN ISSUE K1 (docs/KNOWN_ISSUES.md): which weight formula did the paper's
+# grid use?  Under the paper's W = 1 + gamma*U, gamma=1 arms ARE weighted
+# (W = 1 + U). Under the refactor's W = 1 + (gamma-1)*U (and uat_old's gamma**U)
+# they are NOT (W = 1, identical to baseline).
+#
+# Re-run the two reported gamma=1 arms with the no-weighting formula. Compare
+# against the same arms in parity_sam (paper formula) and the paper's numbers:
+#   octa conformal 0.05 (gamma=1, W=1): paper Table avg epochs 9.4 vs baseline 17.9
+#   cup  conformal 0.15 (gamma=1, W=1)
+# Whichever formula reproduces the paper is the one that ran.
+# 2 arms x 10 runs = 20 runs.
+name: gamma1_formula_check
+backbones: [sam-vit-huge]
+runs: [1, 10]
+output_root: results/errata
+common:
+  weight_form: gm1
+arms:
+  octa:
+    - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 1}
+  cup:
+    - {uq_type: conformal, alpha: 0.15, gamma: 1, n_warmup: 1}

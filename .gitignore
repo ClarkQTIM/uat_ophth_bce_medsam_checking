@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# generated on the server (dataset paths are machine-specific)
+jobs/
+results/
+logs/
+inspect_*.json
+*.pth
+*.pt

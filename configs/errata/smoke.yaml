@@ -1,0 +1,20 @@
+# STEP 2b (docs/REPRODUCTION.md): end-to-end smoke test on real data and real
+# weights. 2 epochs, 4 images per split, every arm type, both backbones.
+# Finishes in minutes; checks that every code path runs and writes its outputs.
+# Results go to results/smoke and mean nothing scientifically.
+name: smoke
+backbones: [sam-vit-huge, medsam]
+runs: [1, 1]
+output_root: results/smoke
+common:
+  weight_form: paper
+  num_epochs: 2
+  limit_samples: 4
+  num_workers: 0
+  keep_checkpoint: false
+arms:
+  cup:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 1}
+    - {uq_type: sam_var,   gamma: 3, n_warmup: 1}
+    - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}

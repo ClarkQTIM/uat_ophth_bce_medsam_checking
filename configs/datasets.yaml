@@ -1,0 +1,28 @@
+# Dataset split CSVs. These MUST be the exact split files used for the paper
+# (docs/REPRODUCTION.md, step 1). Columns: image, segmentation, split
+# (split in {train, val, cal, test}).
+#
+# Paper splits (Methods):
+#   ga   : 110 FAF images, 50/40/10/10 train/test/cal/val   (in-house)
+#   cup  : PAPILA, 438 images, 238/146/51/51; STAPLE-fused optic cup
+#   octa : OCTA-500 2D FAZ projections, 150/90/30/30
+#
+# mask_max_value: pixel value of the foreground in the mask files (paper-era
+# code divided by 255). The loader now refuses non-binary masks.
+
+cup:
+  # Paper-era Alpine path (from bash_scripts/run_experiments.sh):
+  #   /scratch/alpine/cclark@xsede.org/uat/papilla_processed/papilla_cropped_cup_staple_train_valtest_cal.csv
+  csv: FILL_ME/papilla_cropped_cup_staple_train_valtest_cal.csv
+  mask_max_value: 255
+  expected_counts: {train: 238, test: 146, cal: 51, val: 51}
+
+ga:
+  csv: FILL_ME/ga_split.csv
+  mask_max_value: 255
+  expected_counts: {train: 50, test: 40, cal: 10, val: 10}
+
+octa:
+  csv: FILL_ME/octa_faz_split.csv
+  mask_max_value: 255
+  expected_counts: {train: 150, test: 90, cal: 30, val: 30}

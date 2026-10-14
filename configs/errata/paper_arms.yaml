@@ -1,0 +1,39 @@
+# The configurations REPORTED in the paper, read from the x-axis labels of
+# Figures 1-6 (rendered at 300 dpi; see docs/PAPER_CONFIGS.md for the crops and
+# cross-checks against the Figure 7 legends). This file is the single source
+# for both the SAM parity runs and the MedSAM primary runs.
+#
+# gamma follows the PAPER's convention (W = 1 + gamma*U). Baseline is gamma=0,
+# n_warmup=0 by folder convention.
+
+cup:   # Figures 1 and 4
+  - {uq_type: none}
+  - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+  - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
+  - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 5}
+  - {uq_type: conformal, alpha: 0.10, gamma: 5, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.15, gamma: 1, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.25, gamma: 2, n_warmup: 2}
+  - {uq_type: conformal, alpha: 0.30, gamma: 3, n_warmup: 1}
+
+ga:    # Figures 2 and 5 (no alpha=0.05 arm: cannot be calibrated with n_cal=10, ERRATA E6)
+  - {uq_type: none}
+  - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+  - {uq_type: sam_var,   gamma: 5, n_warmup: 3}
+  - {uq_type: conformal, alpha: 0.10, gamma: 3, n_warmup: 2}
+  - {uq_type: conformal, alpha: 0.15, gamma: 2, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.20, gamma: 5, n_warmup: 2}
+  - {uq_type: conformal, alpha: 0.25, gamma: 4, n_warmup: 2}
+  - {uq_type: conformal, alpha: 0.30, gamma: 5, n_warmup: 1}
+
+octa:  # FAZ; Figures 3 and 6
+  - {uq_type: none}
+  - {uq_type: entropy,   gamma: 4, n_warmup: 2}
+  - {uq_type: sam_var,   gamma: 4, n_warmup: 3}
+  - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.10, gamma: 3, n_warmup: 3}
+  - {uq_type: conformal, alpha: 0.15, gamma: 3, n_warmup: 4}
+  - {uq_type: conformal, alpha: 0.20, gamma: 1, n_warmup: 3}
+  - {uq_type: conformal, alpha: 0.25, gamma: 2, n_warmup: 4}
+  - {uq_type: conformal, alpha: 0.30, gamma: 3, n_warmup: 4}
