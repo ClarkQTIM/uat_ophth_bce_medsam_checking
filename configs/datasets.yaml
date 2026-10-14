@@ -1,28 +1,22 @@
-# Dataset split CSVs. These MUST be the exact split files used for the paper
-# (docs/REPRODUCTION.md, step 1). Columns: image, segmentation, split
-# (split in {train, val, cal, test}).
-#
-# Paper splits (Methods):
-#   ga   : 110 FAF images, 50/40/10/10 train/test/cal/val   (in-house)
-#   cup  : PAPILA, 438 images, 238/146/51/51; STAPLE-fused optic cup
-#   octa : OCTA-500 2D FAZ projections, 150/90/30/30
-#
-# mask_max_value: pixel value of the foreground in the mask files (paper-era
-# code divided by 255). The loader now refuses non-binary masks.
+# Dataset split CSVs used for the errata re-runs. Copies of the paper-era split
+# files with image paths updated (originals untouched); kept out of git (data/).
+# Splits verified identical to every other surviving copy (2026-10-14).
+#   cup  original: uat_dice/uat_old/data/segmentation/papila_processed/papila_cropped_cup_staple_train_val_test_cal.csv
+#   ga   original: uat_dice/uat_old/data/segmentation/geographic_atropy/ga_dataset_train_val_test_cal.csv
+# expected_counts = what the paper-era CSV contains (see ERRATA_LOG E9, E10 for
+# where the paper text differs).
 
 cup:
-  # Paper-era Alpine path (from bash_scripts/run_experiments.sh):
-  #   /scratch/alpine/cclark@xsede.org/uat/papilla_processed/papilla_cropped_cup_staple_train_valtest_cal.csv
-  csv: FILL_ME/papilla_cropped_cup_staple_train_valtest_cal.csv
+  csv: /scratch90/chris_/paper_crisis/data/cup_split.csv
   mask_max_value: 255
   expected_counts: {train: 238, test: 146, cal: 51, val: 51}
 
 ga:
-  csv: FILL_ME/ga_split.csv
+  csv: /scratch90/chris_/paper_crisis/data/ga_split.csv
   mask_max_value: 255
-  expected_counts: {train: 50, test: 40, cal: 10, val: 10}
+  expected_counts: {train: 40, test: 50, cal: 10, val: 10}   # paper text says 50/40 train/test
 
 octa:
-  csv: FILL_ME/octa_faz_split.csv
+  csv: FILL_ME/octa_faz_split.csv     # not yet found
   mask_max_value: 255
   expected_counts: {train: 150, test: 90, cal: 30, val: 30}
