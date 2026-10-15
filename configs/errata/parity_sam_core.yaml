@@ -1,0 +1,23 @@
+# PRIORITY subset of parity_sam (2026-10-15): the arms shown in Figures 1-2 for cup
+# and GA (baseline, entropy, variance, the conformal arm shown), 10 runs each = 80 runs.
+# Same settings and output folder as parity_sam.yaml, so these runs count towards it;
+# make_jobs on parity_sam afterwards and run_uat skip what is already complete.
+name: parity_sam_core
+backbones: [sam-vit-huge]
+runs: [1, 10]
+output_root: results/errata_v2
+common:
+  weight_form: paper
+  val_weighting: none
+  track_all_criteria: true
+arms:
+  cup:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
+  ga:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 5, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.25, gamma: 4, n_warmup: 2}

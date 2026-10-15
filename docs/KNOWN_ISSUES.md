@@ -99,3 +99,11 @@ Original note:
 The paper-era code used SAM's processor. We use each backbone's own processor.
 `inspect_backbone.py` records both; document the difference in the erratum if
 there is one.
+
+### K11. Does UAT improve Dice under a common stopping criterion? — OPEN (central)
+ERRATA E14. **Resolve by:** `results/errata_v2` runs with per-epoch tracking, analysed
+with `scripts/select_offline.py` under DECISIONS D17.
+
+### K12. Why did cup γ = 5, W = 1–4 run with unweighted validation? — OPEN, low priority
+A separate batch with a different code version (E14). Only matters for explaining the
+paper-era data; cup Conf-0.10 (γ5 W1) is the one reported cell affected.

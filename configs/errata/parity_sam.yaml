@@ -1,12 +1,17 @@
 # STEP 3 (docs/REPRODUCTION.md): parity check.
 # The paper's reported configurations, re-run with the backbone the paper-era
 # code actually loaded (SAM ViT-H). If the new pipeline is faithful, these
-# distributions should match the paper's Figures 1-6 and Table.
+# distributions should match the paper's Figures 1-6 (the Table cannot be
+# reproduced from the paper's own runs, ERRATA E13). Parity is judged under the
+# validation criterion each cell actually used (as_run, ERRATA E14).
 # 26 arms x 10 runs = 260 runs.
 name: parity_sam
 backbones: [sam-vit-huge]
 runs: [1, 10]
-output_root: results/errata
+output_root: results/errata_v2
 arms_file: paper_arms.yaml
 common:
-  weight_form: paper            # assumption D2; tested by gamma1_formula_check.yaml
+  weight_form: paper
+  val_weighting: none          # primary = paper text; all criteria tracked (D16)
+  track_all_criteria: true
+# weight_form paper: confirmed from the paper-era runs (ERRATA E3, E14)

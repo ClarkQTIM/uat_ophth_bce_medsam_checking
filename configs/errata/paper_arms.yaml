@@ -5,13 +5,15 @@
 #
 # gamma follows the PAPER's convention (W = 1 + gamma*U). Baseline is gamma=0,
 # n_warmup=0 by folder convention.
+# paper_val: which validation loss the paper-era runs of that cell used for early
+# stopping (default weighted; ERRATA E14). Used by scripts/select_offline.py (as_run).
 
 cup:   # Figures 1 and 4
   - {uq_type: none}
   - {uq_type: entropy,   gamma: 5, n_warmup: 5}
   - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
   - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 5}
-  - {uq_type: conformal, alpha: 0.10, gamma: 5, n_warmup: 1}
+  - {uq_type: conformal, alpha: 0.10, gamma: 5, n_warmup: 1, paper_val: unweighted}   # cup g5 W1-4 ran with unweighted validation (ERRATA E14)
   - {uq_type: conformal, alpha: 0.15, gamma: 1, n_warmup: 1}
   - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
   - {uq_type: conformal, alpha: 0.25, gamma: 2, n_warmup: 2}

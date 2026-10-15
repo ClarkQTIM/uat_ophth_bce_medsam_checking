@@ -108,3 +108,38 @@ repo id, parameter count, processor settings, git commit and full config to
 ### D15. Evidential track
 Separate, MedSAM only, unweighted (no UAT), set up but not run until the
 literature review is done. See `src/uatcheck/evidential/README.md`.
+
+### D16. Validation criteria: log all, stop on the paper's text, select offline (2026-10-15)
+After ERRATA E14. Every run logs, every epoch: unweighted validation BCE, U-weighted
+validation BCE (same γ and formula, U computed on validation from epoch 1, as the
+paper-era code did), validation soft Dice, and test soft/hard Dice
+(`track_all_criteria: true`). The primary early stopping (what `test_metrics.txt`
+reports) uses `val_weighting: none` (the paper's text); training continues until all
+three criteria have exhausted patience 5 (max 40 epochs). Because stopping does not
+change training, `scripts/select_offline.py` reproduces exactly what early stopping
+under each criterion would have selected, from one set of runs. A test checks that
+the offline simulation of the primary criterion reproduces the saved checkpoint and
+its test Dice. Runs go to `results/errata_v2`; the 42 runs in `results/errata`
+(previous pipeline, unweighted criterion only) are kept as interim records.
+
+### D17. Pre-registered analysis of the re-runs (DRAFT, fixed 2026-10-15; to be confirmed by C.W.C. before more results are seen)
+Disclosure: written after seeing (a) the paper-era natural experiment in E14 and
+(b) 42 interim runs of the previous pipeline (unweighted criterion only; cup entropy
+n = 4 vs baseline n = 3; GA n = 2 vs 2). No `results/errata_v2` result had been seen.
+
+All criteria use patience 5, test soft Dice, 10 runs per arm, two-sided Mann-Whitney
+vs the baseline **under the same criterion**, Holm across UQ arms within a dataset,
+Cliff's δ and bootstrap CIs reported.
+
+- **Q1 Parity (SAM ViT-H): is the new pipeline faithful?** Criterion `as_run` (per
+  cell, the validation loss the paper-era runs used). D12 tolerances for baseline and
+  entropy means; entropy > baseline P < 0.05. Supplementary: each cell vs the paper's
+  own 10 runs (Mann-Whitney).
+- **Q2 As written:** criterion `unweighted` for every arm (the paper's Methods).
+- **Q3 Common, outcome-aligned:** criterion `dice` (validation soft Dice) for every arm.
+- **Main claim ("UAT improves Dice") is upheld for a backbone and dataset only if
+  entropy > baseline with P < 0.05 under both Q2 and Q3.** If it holds only under the
+  weighted criterion, the conclusion is that the reported gains are not demonstrated to
+  come from the weighted training loss rather than from the stopping criterion.
+- Results under all four criteria are reported for every arm, whatever they show.
+- Same analysis for MedSAM (`medsam_primary`), with Q2/Q3 as the primary questions.

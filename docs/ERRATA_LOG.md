@@ -299,3 +299,49 @@ describe the same experiments, so the inconsistency should be corrected, not the
 Table declared wrong. **Action:** report the convergence analysis from the parity
 re-runs (provenance recorded for every run) and state why in the erratum. The Dice
 results (Figures 1–6) are not affected.
+
+---
+
+## E14. Early stopping used the uncertainty-weighted validation loss, not the unweighted loss the Methods state — CONFIRMED from training logs (code lost); impact on the main claim under test
+
+*Found 2026-10-15 (docs/records/interim_2026-10-15.md).*
+
+**Paper says:** "Training is guided by early stopping using unweighted loss with a
+patience of 5 epochs" (Methods).
+
+**Paper-era logs show** (`loss_parameters.csv` of the 4,890 surviving runs) that the
+validation loss driving early stopping and checkpoint selection was weighted by the
+uncertainty map, with the same γ and formula as training, from epoch 1:
+1. At epoch 1 (warmup: training is unweighted for every γ) the *training* loss is
+   the same for every γ (cup 0.2245–0.2302), but the entropy arm's *validation*
+   loss rises linearly with γ (cup 0.176, 0.230, 0.280, 0.347 for γ = 1–4; FAZ
+   0.016 → 0.030 for γ = 1–5), extrapolating at γ = 0 to the unweighted value of the
+   conformal arms (cup ≈ 0.12, FAZ ≈ 0.012). The variance arm shows the same γ trend.
+2. Conformal arms (U = 0 before the first calibration) have unweighted-looking
+   validation loss at epoch 1, then a jump right after the first calibration that
+   grows with γ (cup ×1.10, 1.22, 1.29, 1.45 for γ = 1–4).
+3. The γ = 1 cells are already weighted (ratio ≈ 1.2–1.4), an independent
+   confirmation of W = 1 + γU (E3).
+
+**Exception:** cup γ = 5, W = 1–4 (all arms) ran with **unweighted** validation
+(epoch-1 entropy ratio ≈ 1.0; cup γ = 5, W = 5 is weighted, ratio 3.1): a batch run
+with a different code version. Of the reported cells, only cup Conf-0.10 (γ5 W1) is
+affected; `configs/errata/paper_arms.yaml` marks it `paper_val: unweighted`.
+
+**Why it matters.** The baseline has no uncertainty map, so its stopping criterion
+is plain BCE; the UAT arms stopped on a different criterion. In the paper's own runs
+(cup, entropy arm), the cells with weighted validation average 0.733–0.781 test Dice
+and 9.7–15.5 epochs, while the cells with unweighted validation (γ5 W1–4, n = 40)
+average **0.672** and **6.7 epochs**, below the paper's cup baseline (0.705, figure
+reading). Caveat: those cells also differ in γ/W and possibly in other code details.
+Our interim re-runs with unweighted validation agree in direction (small n): in 2 of
+4 cup entropy runs and 2 of 2 GA entropy runs, early stopping selected a checkpoint
+from inside the warmup, i.e. a model identical to the baseline of the same seed.
+
+**What is not yet known:** whether entropy-UAT improves Dice when every arm is stopped
+by the same criterion. The reported gains may be largely an effect of the weighted
+stopping criterion (which lets UAT arms train longer), not of the weighted training
+loss. Tested by the re-runs under the pre-registered analysis in DECISIONS D17.
+
+**Action:** correct the Methods statement; report results under a common stopping
+criterion (D17) alongside the as-run criterion.

@@ -6,7 +6,9 @@
 name: medsam_primary
 backbones: [medsam]
 runs: [1, 10]
-output_root: results/errata
+output_root: results/errata_v2
 arms_file: paper_arms.yaml
 common:
   weight_form: paper
+  val_weighting: none          # primary = paper text; all criteria tracked (D16)
+  track_all_criteria: true

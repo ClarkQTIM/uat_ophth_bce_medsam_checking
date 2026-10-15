@@ -14,6 +14,19 @@ Per epoch (paper-era order):
   4. conformal arm: recalibrate qhat when (epoch_index + 1) % n_warmup == 0
 After training: reload the best checkpoint, evaluate on test.
 
+Validation criteria (DECISIONS D16, ERRATA E14). Every epoch logs three:
+  val_loss_unweighted   BCE on the validation set (what the paper's Methods describe)
+  val_loss_weighted     BCE weighted by U with the same gamma and formula, U computed
+                        on validation from epoch 1 (no warmup gating) = what the
+                        paper-era grid code actually used for early stopping
+  val_soft_dice         validation soft Dice (a criterion common to all arms)
+`val_weighting` ("none" | "paper_era") picks which loss drives the PRIMARY early
+stopping and checkpoint (written to test_metrics.txt / loss_parameters.csv).
+With `track_all_criteria: true` (default) training continues until EVERY criterion
+has exhausted its patience (or num_epochs), and test soft/hard Dice are evaluated
+every epoch. Stopping does not affect training, so scripts/select_offline.py can
+then reproduce exactly what early stopping under each criterion would have selected.
+
 Outputs (paper-compatible, so the analysis scripts in analysis/ read them):
   loss_parameters.csv   epoch rows + 'early_stop' row + 'test' row
                         (paper-era quirk kept: when early stopping triggers, the
@@ -66,6 +79,8 @@ DEFAULTS = {
     "variance_prediction_token": "multimask0",  # D4
     "detach_uncertainty": False,            # D5
     "clip_conformal_level": False,          # D6
+    "val_weighting": "none",                # D16: "none" (paper text) | "paper_era" (as run)
+    "track_all_criteria": True,             # D16: run until all criteria stop; test every epoch
     # --- training (paper Methods) ---
     "num_epochs": 40,
     "patience": 5,
@@ -115,6 +130,8 @@ def validate_config(cfg):
         raise ValueError("conformal arm needs alpha")
     if cfg["uq_type"] != "none" and int(cfg["n_warmup"]) < 1:
         raise ValueError("UQ arms need n_warmup >= 1 (paper grid: 1..5)")
+    if cfg["val_weighting"] not in ("none", "paper_era"):
+        raise ValueError("val_weighting must be 'none' or 'paper_era'")
     if cfg["uq_type"] == "none" and (float(cfg["gamma"]) != 0 or int(cfg["n_warmup"]) != 0):
         raise ValueError("baseline must use gamma=0, n_warmup=0 (folder convention)")
 
@@ -178,6 +195,11 @@ def train_one_run(cfg_in):
     params_rows, epoch_rows, conformal_log = [], [], []
     best_val, best_epoch, patience_counter = math.inf, 0, 0
     qhat, early_stopped, stopped_at = None, False, None
+    primary_done = False
+    qhat_primary = None          # conformal threshold in force when the primary criterion stopped
+    # shadow early stopping for every criterion (sign: lower is better)
+    crit = {"unweighted": [math.inf, 0, 0], "weighted": [math.inf, 0, 0], "dice": [math.inf, 0, 0]}
+    crit_done = {k: False for k in crit}
     ckpt = os.path.join(run_dir, "best_model.pth")
     loss_name = LOSS_DIR[cfg["weight_form"]]
 
@@ -212,59 +234,96 @@ def train_one_run(cfg_in):
 
         # ---------------- val ----------------
         model.eval()
-        va_loss, va_uqd, va_u, va_dice, m = 0.0, 0.0, [], [], 0
+        va_unw, va_w, va_uqd, va_u, va_dice, m = 0.0, 0.0, 0.0, [], [], 0
         with torch.no_grad():
             for b, (inputs, seg) in enumerate(val_loader):
                 seg = seg.to(device)
                 probs, var_map = fwd(inputs)
                 U = uncertainty_map(uq, probs, var_map, qhat, cfg["entropy_normalize"])
                 va_uqd += uq_error_dice(probs, seg, U)
-                va_loss += criterion(probs, seg, None).item()      # UNWEIGHTED
+                va_unw += criterion(probs, seg, None).item()        # paper text
+                va_w += criterion(probs, seg, U).item()             # paper-era code (D16)
                 va_dice.extend(soft_dice_per_image(probs, seg)[:, 0].tolist())
                 if U is not None and active:
                     va_u.append(float(U.mean()))
                 if b == 0 and cfg["save_epoch_images"]:
                     _save_images(run_dir, epoch, "val", seg, probs, U)
                 m += 1
-        va_loss /= max(m, 1)
+        va_unw /= max(m, 1)
+        va_w /= max(m, 1)
         va_uqd /= max(m, 1)
+        va_loss = va_w if cfg["val_weighting"] == "paper_era" else va_unw
+        va_dice_mean = float(np.mean(va_dice)) if va_dice else float("nan")
+
+        # ---------------- test every epoch (offline selection) ----------------
+        te_soft, te_hard = float("nan"), float("nan")
+        if cfg["track_all_criteria"]:
+            with torch.no_grad():
+                ts, th = [], []
+                for inputs, seg in test_loader:
+                    probs, _ = fwd(inputs)
+                    seg = seg.to(device)
+                    ts.extend(soft_dice_per_image(probs, seg)[:, 0].tolist())
+                    th.extend(hard_dice_per_image(probs, seg)[:, 0].tolist())
+            te_soft, te_hard = float(np.mean(ts)), float(np.mean(th))
 
         row = {
             "epoch": epoch + 1, "loss_type": loss_name, "uncertainty_type": uq,
             "gamma": cfg["gamma"], "n_warmup": W, "uq_active": active,
             "train_loss": tr_loss, "train_uq_error_dice": tr_uqd,
             "train_uncertainty": float(np.mean(tr_u)) if tr_u else float("nan"),
-            "val_loss": va_loss, "val_uq_error_dice": va_uqd,
+            "val_loss": va_loss, "val_loss_unweighted": va_unw, "val_loss_weighted": va_w,
+            "val_uq_error_dice": va_uqd,
             "val_uncertainty": float(np.mean(va_u)) if va_u else float("nan"),
-            "val_soft_dice": float(np.mean(va_dice)) if va_dice else float("nan"),
+            "val_soft_dice": va_dice_mean,
+            "test_soft_dice": te_soft, "test_hard_dice": te_hard,
             "seconds": round(time.time() - t0, 1),
             "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1024 ** 3, 2)
                            if torch.cuda.is_available() else float("nan"),
         }
 
         # ---------------- early stopping (paper-era logic) ----------------
-        if va_loss < best_val:
-            best_val, best_epoch, patience_counter = va_loss, epoch + 1, 0
-            torch.save(model.state_dict(), ckpt)
-        else:
-            patience_counter += 1
+        if not primary_done:
+            if va_loss < best_val:
+                best_val, best_epoch, patience_counter = va_loss, epoch + 1, 0
+                torch.save(model.state_dict(), ckpt)
+            else:
+                patience_counter += 1
+        # shadow criteria
+        for k, v in (("unweighted", va_unw), ("weighted", va_w), ("dice", -va_dice_mean)):
+            c = crit[k]
+            if crit_done[k]:
+                continue
+            if v < c[0]:
+                c[0], c[1], c[2] = v, epoch + 1, 0
+            else:
+                c[2] += 1
+            if c[2] >= int(cfg["patience"]):
+                crit_done[k] = True
+            row[f"best_epoch_{k}"] = c[1]
+            row[f"patience_{k}"] = c[2]
         row["patience_counter"] = patience_counter
         row["best_epoch_so_far"] = best_epoch
         epoch_rows.append(row)
         pd.DataFrame(epoch_rows).to_csv(os.path.join(run_dir, "epoch_log.csv"), index=False)
-        print(f"[epoch {epoch + 1}] train {tr_loss:.4f} | val {va_loss:.4f} | "
-              f"val dice {row['val_soft_dice']:.4f} | U {row['val_uncertainty']:.4g} | "
+        print(f"[epoch {epoch + 1}] train {tr_loss:.4f} | val unw {va_unw:.4f} w {va_w:.4f} | "
+              f"val dice {va_dice_mean:.4f} | test dice {te_soft:.4f} | U {row['val_uncertainty']:.4g} | "
               f"patience {patience_counter}/{cfg['patience']} | {row['seconds']}s | "
               f"peak GPU {row['peak_gpu_gb']} GB")
 
-        if patience_counter >= int(cfg["patience"]):
-            early_stopped, stopped_at = True, epoch + 1
-            params_rows.append({"epoch": "early_stop", "stopped_at_epoch": epoch + 1,
-                                "best_epoch": best_epoch, "best_val_loss": best_val,
-                                "patience_used": cfg["patience"]})
+        if not primary_done:
+            if patience_counter >= int(cfg["patience"]):
+                primary_done, early_stopped, stopped_at = True, True, epoch + 1
+                qhat_primary = qhat
+                params_rows.append({"epoch": "early_stop", "stopped_at_epoch": epoch + 1,
+                                    "best_epoch": best_epoch, "best_val_loss": best_val,
+                                    "patience_used": cfg["patience"]})
+            else:
+                params_rows.append(row)   # paper-era: the triggering epoch is not written (D8)
+            pd.DataFrame(params_rows).to_csv(os.path.join(run_dir, "loss_parameters.csv"), index=False)
+
+        if primary_done and (not cfg["track_all_criteria"] or all(crit_done.values())):
             break
-        params_rows.append(row)   # paper-era: the triggering epoch is not written (D8)
-        pd.DataFrame(params_rows).to_csv(os.path.join(run_dir, "loss_parameters.csv"), index=False)
 
         # ---------------- conformal recalibration ----------------
         if uq == "conformal" and (epoch + 1) % W == 0:
@@ -279,7 +338,8 @@ def train_one_run(cfg_in):
     # ---------------- test with the best checkpoint ----------------
     model.load_state_dict(torch.load(ckpt, map_location=device))
     model.eval()
-    results = evaluate(model, test_loader, criterion, uq, qhat, cfg, device, run_dir)
+    results = evaluate(model, test_loader, criterion, uq,
+                       qhat_primary if primary_done else qhat, cfg, device, run_dir)
 
     # validation Dice of the selected checkpoint (for validation-based model selection)
     with torch.no_grad():
@@ -300,14 +360,17 @@ def train_one_run(cfg_in):
                 "test_uq_error_auroc": results["uq_error_auroc"],
                 "val_dice_at_best": results["val_dice_at_best"],
                 "trained_epochs": best_epoch, "stopped_at_epoch": stopped_at,
-                "early_stopped": early_stopped}
+                "early_stopped": early_stopped, "val_weighting": cfg["val_weighting"],
+                "epochs_run": len(epoch_rows)}
     params_rows.append(test_row)
     pd.DataFrame(params_rows).to_csv(os.path.join(run_dir, "loss_parameters.csv"), index=False)
     write_test_metrics(run_dir, results, len(test_loader.dataset))
 
     size_gb = os.path.getsize(ckpt) / 1024 ** 3
     update_manifest(run_dir, checkpoint_size_gb=round(size_gb, 3),
-                    finished=True, best_epoch=best_epoch, stopped_at_epoch=stopped_at)
+                    finished=True, best_epoch=best_epoch, stopped_at_epoch=stopped_at,
+                    epochs_run=len(epoch_rows),
+                    shadow_best_epochs={k: v[1] for k, v in crit.items()})
     if not cfg["keep_checkpoint"]:
         os.remove(ckpt)
     print(f"[done] {run_dir} | test soft Dice {results['dice_foreground']:.4f}")

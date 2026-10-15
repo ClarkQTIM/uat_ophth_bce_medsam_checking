@@ -60,21 +60,24 @@ Use the `seconds` and `peak_gpu_gb` columns of the `epoch_log.csv` files to
 estimate the cost of steps 3-5 and how many runs fit side by side on one GPU
 (batch size stays 1, as in the paper; parallelism comes from concurrent runs).
 
-## 3. Parity: SAM ViT-H, paper's configurations (260 runs)
+## 3. Parity: SAM ViT-H, paper's configurations
+
+Runs track every validation criterion and test Dice per epoch (DECISIONS D16).
+Priority subset first (80 runs: cup + GA, the arms of Figures 1–2), then the rest:
 
 ```bash
-python scripts/make_jobs.py configs/errata/parity_sam.yaml --out jobs/parity_sam.jsonl
-sbatch --array=0-259%15 scripts/slurm_array.sbatch jobs/parity_sam.jsonl   # Alpine
-# or, on the lab server (2 SAM ViT-H runs per A100 80GB), inside tmux:
-#    scripts/run_pool.sh jobs/parity_sam.jsonl "0 0 1 1"
-python scripts/compare_arms.py --root results/errata --backbone sam_vit_huge --mode parity
+python scripts/make_jobs.py configs/errata/parity_sam_core.yaml --out jobs/parity_core.jsonl
+python scripts/make_jobs.py configs/errata/parity_sam.yaml --out jobs/parity_sam_cupga.jsonl --only-dataset cup ga
+# 2 SAM ViT-H runs per A100 80GB; e.g. 4 screens, each a slice of the job file:
+#   scripts/run_local.sh jobs/parity_core.jsonl <gpu> <start> <end>
+python scripts/select_offline.py --root results/errata_v2 --backbone sam_vit_huge
 ```
 
-Pass criterion: DECISIONS D12. **If parity fails, stop** and diagnose before
-MedSAM: compare against the surviving paper-era runs (K7), then the fidelity
-switches (`weight_form`, `entropy_normalize`).
+Analysis and criteria: DECISIONS D17 (Q1 parity under `as_run`; Q2 `unweighted`;
+Q3 `dice`). `scripts/compare_arms.py` still summarizes the primary criterion only.
+Runs already complete are skipped, so the second job file only adds what is missing.
 
-## 4. Weight-formula check (K1, 20 runs)
+## 4. Weight-formula check (K1) — no longer needed (resolved from the paper-era runs, ERRATA E3/E14)
 
 ```bash
 python scripts/make_jobs.py configs/errata/gamma1_formula_check.yaml --out jobs/gamma1.jsonl

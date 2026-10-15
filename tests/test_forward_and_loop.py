@@ -90,3 +90,50 @@ def test_full_run_writes_paper_compatible_outputs(tmp_path, monkeypatch, arm):
         assert bool(ep.loc[ep.epoch >= 2, "uq_active"].all())
     # folder naming the analysis scripts expect
     assert "/medsam/weighted_bce_v2/" in run_dir.replace(os.sep, "/")
+
+
+@pytest.mark.parametrize("arm", [
+    {"uq_type": "none"},
+    {"uq_type": "entropy", "gamma": 5, "n_warmup": 1},
+    {"uq_type": "conformal", "alpha": 0.2, "gamma": 2, "n_warmup": 1},
+])
+@pytest.mark.parametrize("val_weighting", ["none", "paper_era"])
+def test_tracking_and_offline_selection(tmp_path, monkeypatch, arm, val_weighting):
+    """All criteria are logged every epoch; offline simulation of the primary criterion
+    reproduces the checkpoint actually selected and its test Dice (D16)."""
+    try:
+        model = tiny_sam()
+    except Exception as e:
+        pytest.skip(f"tiny SAM unavailable: {e}")
+    import uatcheck.train_uat as tu
+    from uatcheck.backbones import BackboneInfo
+    import importlib.util, sys as _sys
+    spec = importlib.util.spec_from_file_location(
+        "select_offline", os.path.join(os.path.dirname(__file__), "..", "scripts", "select_offline.py"))
+    so = importlib.util.module_from_spec(spec); spec.loader.exec_module(so)
+
+    info = BackboneInfo("medsam", "tiny", "tiny", "tiny", 1, 1e-6, (0, 1))
+    monkeypatch.setattr(tu, "load_backbone", lambda *a, **k: (model, None, info))
+    monkeypatch.setattr(tu, "make_loaders", lambda *a, **k: tuple(
+        DataLoader(_Synth(n, s), batch_size=1, shuffle=False)
+        for n, s in ((4, 0), (3, 1), (5, 2), (3, 3))))
+    cfg = {"dataset": "cup", "csv": "unused.csv", "backbone": "medsam",
+           "output_root": str(tmp_path), "num_epochs": 6, "patience": 2,
+           "device": "cpu", "learning_rate": 1e-3, "val_weighting": val_weighting,
+           "track_all_criteria": True, **arm}
+    run_dir = tu.train_one_run(cfg)
+    ep = pd.read_csv(os.path.join(run_dir, "epoch_log.csv"))
+    for col in ("val_loss_unweighted", "val_loss_weighted", "val_soft_dice", "test_soft_dice"):
+        assert col in ep and ep[col].notna().all()
+    if arm["uq_type"] == "none":
+        assert (ep.val_loss_unweighted - ep.val_loss_weighted).abs().max() < 1e-9
+    if arm["uq_type"] == "entropy":   # weighted from epoch 1 even during warmup (paper-era)
+        assert ep.val_loss_weighted.iloc[0] > ep.val_loss_unweighted.iloc[0]
+    primary = "weighted" if val_weighting == "paper_era" else "unweighted"
+    col, sign = so.CRITS[primary]
+    best_ep, _ = so.simulate(ep, col, sign, 2)
+    man = json.load(open(os.path.join(run_dir, "run_manifest.json")))
+    assert best_ep == man["best_epoch"]
+    txt = open(os.path.join(run_dir, "test_metrics.txt")).read()
+    fg = float(txt.split("Foreground Dice Score:")[1].split()[0])
+    assert abs(fg - float(ep[ep.epoch == best_ep].test_soft_dice.iloc[0])) < 1e-5
