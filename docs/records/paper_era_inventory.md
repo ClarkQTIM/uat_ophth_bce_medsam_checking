@@ -82,16 +82,19 @@ refactor's 1 + (γ−1)U or `uat_old`'s γ^U. This is consistent with the paper'
 W = 1 + γU (the only documented formula that weights at γ = 1); the data cannot
 distinguish it from other formulas with that property.
 
-## The Table's epoch counts do not come from these runs (ERRATA E13)
+## The Table's epoch counts cannot be reproduced from these runs (ERRATA E13)
 
 The convergence script counts epoch rows in `loss_parameters.csv` for the best cell
 (`2_run_training_curves_analysis.py`, `avg_total_epochs`). For the reported cells
 above, only one Table value matches (GA Conf-0.25: 21.4 = 21.4). No other measure
 matches either (epochs to 90/95/99 % of the loss drop, best epoch, stop epoch),
 e.g. cup entropy: Table 9.8, rows 15.5, to-90 % 5.7, best epoch 11.5;
-FAZ Conf-0.05: Table 9.4, rows 16.5. The Table must have been computed from a
-different run set (earlier runs, later overwritten or deleted). The parity
-re-runs will produce a convergence table from runs whose provenance is recorded.
+FAZ Conf-0.05: Table 9.4, rows 16.5. The Table was most likely computed from a
+different run set (earlier runs, later overwritten or deleted), which we cannot
+check, so we cannot say it is wrong about its own runs, only that it is not
+reproducible from the runs behind the figures. Its baseline columns cannot be
+recomputed at all (no cup/GA baseline runs survive). The parity re-runs will
+produce a convergence table from runs whose provenance is recorded.
 
 ## Other confirmations
 

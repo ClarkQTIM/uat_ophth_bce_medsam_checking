@@ -272,21 +272,30 @@ nobody reads it as a weighted baseline.
 
 ---
 
-## E13. The Table's convergence numbers do not come from the runs behind the figures — CONFIRMED (Table needs correcting)
+## E13. The Table's convergence numbers cannot be reproduced from the runs behind the figures — CONFIRMED inconsistency; cause unknown
 
-*Found 2026-10-14 (docs/records/paper_era_inventory.md).*
+*Found 2026-10-14 (docs/records/paper_era_inventory.md). Wording revised the same
+day to claim no more than the evidence supports.*
 
-The surviving tree reproduces every reported cell of Figures 1–6 exactly (best
-test-Dice cell, means to ±0.001). Its epoch counts for those same cells do not
-reproduce the Table: one of 22 matches (GA Conf-0.25, 21.4); e.g. cup entropy
-Table 9.8 vs 15.5 epoch rows; FAZ Conf-0.05 Table 9.4 vs 16.5. No alternative
-measure matches (epochs to 90/95/99 % of the loss drop, best epoch, stop epoch).
-The Table was evidently computed from a different set of runs, which no longer
-exists. Its headline result, FAZ Conf-0.05 converging 47.5 % faster than baseline
-(P < 0.001), is not supported by the runs behind the figures (16.5 epoch rows
-there; the paper's baseline value is 17.9).
+**What we can show.** The surviving tree is the data behind Figures 1–6 (every
+reported cell is the best test-Dice cell; means match to ±0.001). The Table reports
+average epochs for those same best cells. For 21 reported UQ cells, all 10 runs of
+the cell survive, and we count epochs the way the convergence script does (epoch
+rows in `loss_parameters.csv`). Only one Table value is reproduced (GA Conf-0.25,
+21.4). E.g. cup entropy: Table 9.8, the cell's 10 runs 15.5; FAZ Conf-0.05:
+Table 9.4, the cell's 10 runs 16.5. No alternative measure reproduces the Table
+(epochs to 90/95/99 % of the loss drop, best epoch, stop epoch).
 
-**Impact:** the convergence results (Hypothesis 2, Table) should be corrected
-using runs with documented provenance. The parity re-runs record epochs for every
-run and will supply the corrected Table. The Dice results (Figures 1–6) are not
-affected by this item.
+**What we cannot show.**
+- Whether the Table is correct for the runs it was computed from. Those runs do
+  not survive; the Table may be accurate for an earlier run set that was later
+  overwritten or deleted.
+- The Table's baseline values, % differences and P values: no cup or GA baseline
+  runs survive, and only 2 of 10 FAZ baseline runs.
+
+**Conclusion.** The Figures and the Table appear to describe different sets of
+runs, and only the figures' runs survive. A reader would reasonably assume they
+describe the same experiments, so the inconsistency should be corrected, not the
+Table declared wrong. **Action:** report the convergence analysis from the parity
+re-runs (provenance recorded for every run) and state why in the erratum. The Dice
+results (Figures 1–6) are not affected.
