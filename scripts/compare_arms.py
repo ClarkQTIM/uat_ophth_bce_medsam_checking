@@ -67,7 +67,19 @@ def main():
     ap.add_argument("--loss_dir", default="weighted_bce_v2")
     ap.add_argument("--mode", choices=["parity", "primary", "plain"], default="plain")
     ap.add_argument("--reference", default="configs/errata/paper_reference.yaml")
+    ap.add_argument("--paper_runs", default="docs/records/paper_era_runs.csv",
+                    help="per-run paper-era results (scripts/inventory_paper_era.py); "
+                         "adds a run-level comparison with the paper's own runs per cell")
     args = ap.parse_args()
+    paper = pd.read_csv(args.paper_runs, dtype={"gamma": str, "W": str}) \
+        if os.path.exists(args.paper_runs) else None
+
+    def norm(v):
+        try:
+            f = float(v)
+            return str(int(f)) if f.is_integer() else str(f)
+        except (TypeError, ValueError):
+            return str(v)
     from scipy.stats import levene, mannwhitneyu
 
     ref = yaml.safe_load(open(args.reference))
@@ -98,6 +110,20 @@ def main():
                    "avg_epochs_paper_count": np.mean([r["epochs_paper_count"] for r in runs]),
                    "paper_mean": ref.get(dataset, {}).get("mean_soft_dice", {}).get(arm),
                    "paper_avg_epochs": ref.get(dataset, {}).get("avg_epochs", {}).get(arm)}
+            if paper is not None:
+                if arm == "none":
+                    pr = paper[(paper.dataset == dataset) & (paper.arm == "none")]
+                else:
+                    pr = paper[(paper.dataset == dataset) & (paper.arm == arm)
+                               & (paper.gamma.map(norm) == norm(g)) & (paper.W.map(norm) == norm(w))]
+                row["paper_runs_n"] = len(pr)
+                if len(pr):
+                    row["paper_runs_mean"] = pr.dice.mean()
+                    row["paper_runs_sd"] = pr.dice.std(ddof=1) if len(pr) > 1 else np.nan
+                    row["paper_runs_epochs"] = pr.epochs_rows.mean()
+                    if len(pr) > 1 and len(x) > 1:
+                        row["mw_p_vs_paper_runs"] = mannwhitneyu(x, pr.dice.values,
+                                                                 alternative="two-sided").pvalue
             if arm != "none" and len(x) > 1 and len(b) > 1:
                 row["mw_p"] = mannwhitneyu(x, b, alternative="two-sided").pvalue
                 row["cliffs_delta"] = cliffs_delta(x, b)
@@ -125,6 +151,13 @@ def main():
                       f"entropy mean {ent['mean'].item():.4f} vs paper {pm['entropy']:.3f}: {'ok' if ok_e else 'FAIL'}",
                       f"entropy > baseline, P={ent['mw_p'].item():.4g}: {'ok' if ok_s else 'FAIL'}",
                       f"PARITY {'PASS' if ok_b and ok_e and ok_s else 'FAIL'}"]
+            if "paper_runs_n" in df:
+                lines.append("supplementary (not part of D12): each re-run cell vs the paper's own runs")
+                for _, r in df.iterrows():
+                    if r.get("paper_runs_n", 0):
+                        lines.append(f"  {r.arm:20s} g={r.gamma} W={r.n_warmup}: re-run {r['mean']:.4f} "
+                                     f"(n={r.n}) vs paper runs {r['paper_runs_mean']:.4f} "
+                                     f"(n={int(r['paper_runs_n'])}), P={r.get('mw_p_vs_paper_runs', np.nan):.3g}")
         elif args.mode == "primary" and len(ent):
             up = ent["mean"].item() > bm and ent["mw_p"].item() < 0.05
             lines += [f"entropy {ent['mean'].item():.4f} vs baseline {bm:.4f}, P={ent['mw_p'].item():.4g}, "

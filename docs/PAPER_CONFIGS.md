@@ -39,6 +39,14 @@ numbers and note it here.
 GA has no α = 0.05 arm in Figure 5 (cannot be calibrated with n_cal = 10;
 ERRATA E6). Every Figure 7 legend matches the corresponding Figure 1–3 label.
 
+## Exact values from the paper's own runs (2026-10-14)
+
+The paper-era result tree survives in part, and it is the data behind Figures 1–6
+(docs/records/paper_era_inventory.md). Exact means and SDs for every reported cell
+are tabulated there and used by `scripts/compare_arms.py`; they agree with the
+figure readings below to ±0.001. No cup or GA baseline runs survive, so the
+baselines remain figure readings.
+
 ## Reference values: mean test soft Dice (read from Figures 1–3, ±0.003)
 
 Green triangles = means; orange lines = medians. n = 10 runs per arm.
@@ -54,6 +62,9 @@ cup: entropy, variance and Conf-0.20 all P < 0.01. GA: entropy, variance,
 Conf-0.25 all P < 0.01. FAZ: entropy P < 0.01, variance P < 0.05, Conf-0.05 n.s.
 
 ## Reference values: Table (convergence, exact as printed)
+
+**Warning (ERRATA E13):** these numbers do not come from the runs behind the
+figures; they are recorded here as printed, not as reproduction targets.
 
 | Dataset | Method | Avg. epochs | Diff. | P |
 |---|---|---|---|---|

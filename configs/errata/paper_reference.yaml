@@ -1,23 +1,31 @@
-# Reference values from the paper (docs/PAPER_CONFIGS.md), used by
-# scripts/compare_arms.py. Dice values read from Figures 1-3 (+-0.003);
-# epochs exact from the Table. Arm keys = output folder names.
+# Reference values from the paper, used by scripts/compare_arms.py.
+# mean_soft_dice: baselines read from Figures 1-3 (+-0.003; no cup/GA baseline runs
+#   survive); UQ arms = exact means of the surviving paper-era runs of the reported
+#   cells (docs/records/paper_era_inventory.md), which match the figures to +-0.001.
+# avg_epochs: as printed in the Table. NOTE ERRATA E13: these do not come from the
+#   runs behind the figures; do not use them as parity targets.
+# Run-level comparisons use docs/records/paper_era_runs.csv directly.
+# Arm keys = output folder names.
 # parity_tolerance implements DECISIONS D12.
 
 cup:
   parity_tolerance: 0.02
-  mean_soft_dice: {none: 0.705, entropy: 0.781, sam_var: 0.742, conformal_lac_020: 0.739}
+  mean_soft_dice: {none: 0.705, entropy: 0.7813, sam_var: 0.7421, conformal_lac_005: 0.7155, conformal_lac_010: 0.7233,
+                   conformal_lac_015: 0.7160, conformal_lac_020: 0.7390, conformal_lac_025: 0.7305, conformal_lac_030: 0.7246}
   avg_epochs: {none: 8.5, conformal_lac_005: 7.1, conformal_lac_010: 8.1, conformal_lac_015: 8.2,
                conformal_lac_020: 9.0, conformal_lac_025: 8.8, conformal_lac_030: 8.2,
                sam_var: 9.0, entropy: 9.8}
 ga:
   parity_tolerance: 0.02
-  mean_soft_dice: {none: 0.728, entropy: 0.825, sam_var: 0.786, conformal_lac_025: 0.801}
+  mean_soft_dice: {none: 0.728, entropy: 0.8244, sam_var: 0.7865, conformal_lac_010: 0.7789, conformal_lac_020: 0.7881,
+                   conformal_lac_025: 0.8007, conformal_lac_030: 0.7696}
   avg_epochs: {none: 12.0, conformal_lac_010: 12.8, conformal_lac_015: 10.8,
                conformal_lac_020: 14.1, conformal_lac_025: 21.4, conformal_lac_030: 16.0,
                sam_var: 11.0, entropy: 12.4}
 octa:
   parity_tolerance: 0.01
-  mean_soft_dice: {none: 0.888, entropy: 0.907, sam_var: 0.898, conformal_lac_005: 0.892}
+  mean_soft_dice: {none: 0.888, entropy: 0.9067, sam_var: 0.8980, conformal_lac_005: 0.8918, conformal_lac_010: 0.8877,
+                   conformal_lac_015: 0.8894, conformal_lac_020: 0.8907, conformal_lac_025: 0.8879, conformal_lac_030: 0.8829}
   avg_epochs: {none: 17.9, conformal_lac_005: 9.4, conformal_lac_010: 15.2, conformal_lac_015: 15.2,
                conformal_lac_020: 13.9, conformal_lac_025: 15.9, conformal_lac_030: 13.5,
                sam_var: 13.0, entropy: 19.9}

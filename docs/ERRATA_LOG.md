@@ -103,7 +103,7 @@ of the three multimask outputs.
 
 ---
 
-## E3. Three different weight formulas in the code history — OPEN (assume paper)
+## E3. Three different weight formulas in the code history — RESOLVED 2026-10-14: the grid weighted at γ = 1 (paper formula consistent; refactor changed it)
 
 *Found 2026-10-14.*
 
@@ -127,6 +127,16 @@ significantly from baseline (Table: FAZ Conf-0.05 (γ = 1, W = 1) converges in
 
 **Decision:** assume the paper's formula (DECISIONS D2). **Test:** K1,
 `configs/errata/gamma1_formula_check.yaml`.
+
+**Resolution (2026-10-14, from the paper's own runs; docs/records/paper_era_inventory.md):**
+the 35 γ = 1 entropy/conformal cells differ strongly from one another (cup
+Kruskal–Wallis P = 1.6 × 10⁻¹⁵; FAZ P = 4.3 × 10⁻³) with a dose–response in the
+amount of flagged uncertainty. Under a formula with no weighting at γ = 1 they
+would be replicates. So the grid weighted at γ = 1: not the refactor's
+1 + (γ−1)U, not `uat_old`'s γ^U; consistent with the paper's W = 1 + γU. The
+paper's equation stands. The refactor's formula change means any later
+experiments run with the refactor (e.g. the UAT-Dice/Tversky work) used a
+different γ scale and are not directly comparable with the paper.
 
 **Impact if the paper formula is wrong:** the equation in Methods needs
 correcting and every reported γ maps to a different effective weight; γ = 1 arms
@@ -177,7 +187,7 @@ should be removed. **To confirm** from the paper-era run folders (K7).
 
 ---
 
-## E7. Best configurations were selected on the test set — CONFIRMED (methodological)
+## E7. Best configurations were selected on the test set — CONFIRMED (methodological; also confirmed from the paper's runs)
 
 *Found 2026-10-14.*
 
@@ -195,7 +205,7 @@ Dice (`val_dice_at_best` is now recorded for every run; D13).
 
 ---
 
-## E8. "Avg. Epochs" in the Table undercounts early-stopped runs by one — LIKELY (minor)
+## E8. "Avg. Epochs" in the Table undercounts early-stopped runs by one — CONFIRMED (minor; 4,888/4,888 early-stopped paper-era runs)
 
 *Found 2026-10-14.*
 
@@ -250,3 +260,33 @@ between them is not biased by it in an obvious direction.
 **Action:** disclose in the erratum. The re-runs keep the original splits (to
 reproduce what ran); a patient-level re-split is a planned sensitivity analysis.
 FAZ (OCTA-500) to be checked once its split file is found.
+
+---
+
+## E12. "Final Gamma: 5.000000" in baseline results — NOT AN ERROR (artifact)
+
+*Found 2026-10-14.* Paper-era baseline `test_metrics.txt` files end with
+"Final Gamma: 5.000000". The writer prints the configured γ of the loss object;
+the baseline never passes an uncertainty map, so no weight is applied. Recorded so
+nobody reads it as a weighted baseline.
+
+---
+
+## E13. The Table's convergence numbers do not come from the runs behind the figures — CONFIRMED (Table needs correcting)
+
+*Found 2026-10-14 (docs/records/paper_era_inventory.md).*
+
+The surviving tree reproduces every reported cell of Figures 1–6 exactly (best
+test-Dice cell, means to ±0.001). Its epoch counts for those same cells do not
+reproduce the Table: one of 22 matches (GA Conf-0.25, 21.4); e.g. cup entropy
+Table 9.8 vs 15.5 epoch rows; FAZ Conf-0.05 Table 9.4 vs 16.5. No alternative
+measure matches (epochs to 90/95/99 % of the loss drop, best epoch, stop epoch).
+The Table was evidently computed from a different set of runs, which no longer
+exists. Its headline result, FAZ Conf-0.05 converging 47.5 % faster than baseline
+(P < 0.001), is not supported by the runs behind the figures (16.5 epoch rows
+there; the paper's baseline value is 17.9).
+
+**Impact:** the convergence results (Hypothesis 2, Table) should be corrected
+using runs with documented provenance. The parity re-runs record epochs for every
+run and will supply the corrected Table. The Dice results (Figures 1–6) are not
+affected by this item.
