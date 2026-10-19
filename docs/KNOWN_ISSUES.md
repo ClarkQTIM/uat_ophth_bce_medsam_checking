@@ -46,7 +46,7 @@ run and reported, with this explanation.
 ERRATA E6. **Resolve by:** paper-era GA conformal_lac_005 run folders (do they
 end in a crash at the first calibration?).
 
-### K6. Are the split CSVs the paper's? — RESOLVED for cup and GA (2026-10-14); FAZ OPEN
+### K6. Are the split CSVs the paper's? — RESOLVED for cup and GA (2026-10-14); FAZ: original lost, new seeded split (2026-10-19, ERRATA E15, DECISIONS D19)
 Cup and GA: path-corrected copies of the paper-era CSVs; every surviving copy has
 identical split assignments; counts as in the data (see ERRATA E9, E10); all files
 present; masks binary. SHA-256 in `docs/records/datasets_2026-10-14.txt`. FAZ split

@@ -1,0 +1,46 @@
+== finished runs (errata_v2) by dataset / arm
+      2 errata_v2 n_warmup_0
+      2 errata_v2 n_warmup_2
+      2 errata_v2 n_warmup_3
+      2 errata_v2 n_warmup_5
+== failures
+logs/local_parity_core_0.log
+logs/local_parity_core_20.log
+logs/local_parity_core_21.log
+logs/local_parity_core_22.log
+logs/local_parity_core_23.log
+logs/local_parity_core_24.log
+logs/local_parity_core_40.log
+logs/local_parity_core_60.log
+logs/local_parity_core_61.log
+logs/local_parity_core_62.log
+logs/local_parity_core_63.log
+logs/local_parity_core_64.log
+== E14 direct test: epoch-1 validation loss of entropy runs (paper: cup ~0.38, GA ~1.52)
+ga   run_3  epoch1  unweighted 0.4518  weighted 1.3677
+ga   run_8  epoch1  unweighted 0.6232  weighted 1.6505
+== offline selection, all criteria
+[cup] no runs with per-epoch tracking
+dataset=ga backbone=sam_vit_huge patience=5
+
+[as_run] baseline n=2 mean 0.6413
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7574 (+0.1161) P=0.333 Holm=1 epochs=10.5 | paper runs 0.8007 P=0.0303
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.1771) P=0.333 Holm=1 epochs=18.0 | paper runs 0.8244 P=0.758
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.1166) P=0.333 Holm=1 epochs=10.5 | paper runs 0.7865 P=0.364
+  D12 parity: baseline FAIL, entropy ok, entropy>baseline FAIL -> FAIL
+
+[unweighted] baseline n=2 mean 0.6413
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7069 (+0.0656) P=0.667 Holm=1 epochs=9.0
+  entropy            g=5 W=5: n= 2 mean 0.6413 (+0.0000) P=1 Holm=1 epochs=8.5
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.1166) P=0.333 Holm=1 epochs=10.5
+
+[weighted] baseline n=2 mean 0.6413
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7574 (+0.1161) P=0.333 Holm=1 epochs=10.5
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.1771) P=0.333 Holm=1 epochs=18.0
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.1166) P=0.333 Holm=1 epochs=10.5
+
+[dice] baseline n=2 mean 0.7240
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7564 (+0.0324) P=0.667 Holm=1 epochs=10.0
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.0943) P=0.333 Holm=1 epochs=18.0
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.0339) P=0.667 Holm=1 epochs=10.5
+

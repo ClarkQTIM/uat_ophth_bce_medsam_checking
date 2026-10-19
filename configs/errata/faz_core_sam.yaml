@@ -1,0 +1,19 @@
+# FAZ (OCTA-500) core cells on sam-vit-huge, 10 runs each = 40 runs (2026-10-19).
+# NEW SPLIT: the paper's FAZ split file is lost (ERRATA E15, DECISIONS D19); the split
+# was regenerated with the paper-era script and a seed fixed before any FAZ result.
+# Cells: baseline, entropy, variance and the best conformal arm (alpha 0.05), as
+# reported for FAZ (Figure 3; configs/errata/paper_arms.yaml), unchanged.
+name: faz_core_sam
+backbones: [sam-vit-huge]
+runs: [1, 10]
+output_root: results/errata_v2
+common:
+  weight_form: paper
+  val_weighting: none
+  track_all_criteria: true
+arms:
+  octa:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 4, n_warmup: 2}
+    - {uq_type: sam_var,   gamma: 4, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 1}

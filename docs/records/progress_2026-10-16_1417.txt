@@ -1,0 +1,93 @@
+== 2026-10-16 14:17
+== screens
+	4131705.c4	(10/15/2026 12:50:17 PM)	(Detached)
+	4131694.c3	(10/15/2026 12:50:17 PM)	(Detached)
+	4131689.c2	(10/15/2026 12:50:17 PM)	(Detached)
+	4131686.c1	(10/15/2026 12:50:17 PM)	(Detached)
+== GPUs
+0, 61985 MiB, 100 %
+1, 61985 MiB, 100 %
+== finished runs: dataset / backbone / arm
+      1 cup sam_vit_huge conformal_lac_020
+      4 cup sam_vit_huge entropy
+      4 cup sam_vit_huge none
+      4 cup sam_vit_huge sam_var
+      2 ga sam_vit_huge conformal_lac_025
+      2 ga sam_vit_huge entropy
+      3 ga sam_vit_huge none
+      2 ga sam_vit_huge sam_var
+== running now (epochs so far)
+  cup/sam_vit_huge/conformal_lac_020/run_1  12 epochs
+  cup/sam_vit_huge/conformal_lac_020/run_4  8 epochs
+  ga/sam_vit_huge/entropy/run_9  8 epochs
+== runs that died (Traceback AND no 'Foreground' result)
+  logs/local_parity_core_27.log
+  logs/local_parity_core_3.log
+== what the Traceback is (first one found)
+  "uq_type": "entropy"
+}
+[backbone] sam-vit-huge: facebook/sam-vit-huge | 641.1M params (SAM ViT-H) | processor: facebook/sam-vit-huge
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/multiprocessing/util.py", line 300, in _run_finalizers
+    finalizer()
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/multiprocessing/util.py", line 224, in __call__
+    res = self._callback(*self._args, **self._kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/multiprocessing/util.py", line 133, in _remove_temp_dir
+    rmtree(tempdir)
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/shutil.py", line 769, in rmtree
+    _rmtree_safe_fd(fd, path, onexc)
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/shutil.py", line 697, in _rmtree_safe_fd
+    onexc(os.unlink, fullname, err)
+  File "/persist/python_virtual_environments/clachris/.pyenv/versions/3.12.0/lib/python3.12/shutil.py", line 695, in _rmtree_safe_fd
+== offline selection: SAM ViT-H
+dataset=cup backbone=sam_vit_huge patience=5
+
+[as_run] baseline n=4 mean 0.7301
+  conformal_lac_020  g=2 W=1: n= 1 mean 0.7549 (+nan) P=nan Holm=nan epochs=9.0
+  entropy            g=5 W=5: n= 4 mean 0.7875 (+0.0574) P=0.0286 Holm=0.0571 epochs=16.5 | paper runs 0.7813 P=0.188
+  sam_var            g=3 W=5: n= 4 mean 0.7426 (+0.0125) P=0.343 Holm=0.343 epochs=10.8 | paper runs 0.7421 P=0.839
+  D12 parity: baseline FAIL, entropy ok, entropy>baseline ok -> FAIL
+
+[unweighted] baseline n=4 mean 0.7301
+  conformal_lac_020  g=2 W=1: n= 1 mean 0.7382 (+nan) P=nan Holm=nan epochs=11.0
+  entropy            g=5 W=5: n= 4 mean 0.7154 (-0.0147) P=0.661 Holm=1 epochs=8.2
+  sam_var            g=3 W=5: n= 4 mean 0.7372 (+0.0072) P=0.686 Holm=1 epochs=10.2
+
+[weighted] baseline n=4 mean 0.7301
+  conformal_lac_020  g=2 W=1: n= 1 mean 0.7549 (+nan) P=nan Holm=nan epochs=9.0
+  entropy            g=5 W=5: n= 4 mean 0.7875 (+0.0574) P=0.0286 Holm=0.0571 epochs=16.5
+  sam_var            g=3 W=5: n= 4 mean 0.7426 (+0.0125) P=0.343 Holm=0.343 epochs=10.8
+
+[dice] baseline n=4 mean 0.7817
+  conformal_lac_020  g=2 W=1: n= 1 mean 0.7789 (+nan) P=nan Holm=nan epochs=21.0
+  entropy            g=5 W=5: n= 4 mean 0.7824 (+0.0007) P=1 Holm=1 epochs=17.8
+  sam_var            g=3 W=5: n= 4 mean 0.7931 (+0.0114) P=0.0571 Holm=0.114 epochs=28.0
+
+dataset=ga backbone=sam_vit_huge patience=5
+
+[as_run] baseline n=3 mean 0.6778
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7574 (+0.0797) P=0.4 Holm=0.8 epochs=10.5 | paper runs 0.8007 P=0.0303
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.1406) P=0.2 Holm=0.6 epochs=18.0 | paper runs 0.8244 P=0.758
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.0801) P=0.4 Holm=0.8 epochs=10.5 | paper runs 0.7865 P=0.364
+  D12 parity: baseline FAIL, entropy ok, entropy>baseline FAIL -> FAIL
+
+[unweighted] baseline n=3 mean 0.6778
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7069 (+0.0291) P=0.8 Holm=1 epochs=9.0
+  entropy            g=5 W=5: n= 2 mean 0.6413 (-0.0365) P=0.761 Holm=1 epochs=8.5
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.0801) P=0.4 Holm=1 epochs=10.5
+
+[weighted] baseline n=3 mean 0.6778
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7574 (+0.0797) P=0.4 Holm=0.8 epochs=10.5
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.1406) P=0.2 Holm=0.6 epochs=18.0
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.0801) P=0.4 Holm=0.8 epochs=10.5
+
+[dice] baseline n=3 mean 0.7329
+  conformal_lac_025  g=4 W=2: n= 2 mean 0.7564 (+0.0234) P=0.8 Holm=1 epochs=10.0
+  entropy            g=5 W=5: n= 2 mean 0.8184 (+0.0854) P=0.2 Holm=0.6 epochs=18.0
+  sam_var            g=5 W=3: n= 2 mean 0.7579 (+0.0250) P=0.8 Holm=1 epochs=10.5
+
+== offline selection: MedSAM

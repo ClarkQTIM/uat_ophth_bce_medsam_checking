@@ -101,6 +101,17 @@ screen -dmS m1 bash -c "scripts/run_local.sh jobs/medsam_core.jsonl 0 10 19"
 python scripts/select_offline.py --root results/errata_v2 --backbone medsam
 ```
 
+## 5b. FAZ on a new split (DECISIONS D19; ERRATA E15)
+
+```bash
+python scripts/create_octa_faz_csv.py --images_dir <OCTA_6mm projection folder> \
+    --masks_dir <OCTA_6mm GT_FAZ folder> --out_csv data/octa_faz_split.csv --seed 2026
+# set octa.csv in configs/datasets.yaml to data/octa_faz_split.csv, then
+python scripts/check_datasets.py
+python scripts/make_jobs.py configs/errata/faz_core_medsam.yaml --out jobs/faz_core_medsam.jsonl
+python scripts/make_jobs.py configs/errata/faz_core_sam.yaml --out jobs/faz_core_sam.jsonl
+```
+
 ## 5. MedSAM primary: the erratum's evidence (260 runs)
 
 ```bash

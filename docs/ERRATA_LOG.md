@@ -364,3 +364,27 @@ docs/records/core_sam_2026-10-19/RESULTS.md).**
 criterion (D17) alongside the as-run criterion; the cup result must be described as
 not supported under a common stopping criterion (pending MedSAM, which is the model
 the paper names).
+
+---
+
+## E15. The FAZ split cannot be recovered — CONFIRMED on ophlappc05 and /persist (Alpine not yet checked)
+
+*Found 2026-10-19.*
+
+**Paper says:** OCTA-500 2D FAZ projections in a 150/90/30/30 train/test/calibration/
+validation split.
+
+**What survives:** the script that made the split (`create_octa_faz_csv.py`), but not
+its output. The script assigns splits by `random.shuffle`, and `--seed` defaults to none,
+so without the CSV or the seed the split cannot be regenerated. No FAZ/OCTA split CSV
+exists on ophlappc05 (`/scratch90`) or under `/persist/QTIM/Active/22-2198`; the shell
+history has no record of the command; the paper-era FAZ run folders hold
+`loss_parameters.csv`, `test_metrics.txt` and a few saved epoch images, not the image list.
+Alpine (`/projects`, `/scratch`) not yet checked; scratch is purged automatically.
+
+**Why it matters:** the published FAZ results cannot be re-run on the same test set.
+The paper's FAZ entropy gain (0.907 vs 0.888) is small enough that a different split
+could change it by a comparable amount.
+
+**Action:** re-runs use a new split from the same script with a seed fixed in advance
+(DECISIONS D19). The erratum should state that the original FAZ split was not preserved.
