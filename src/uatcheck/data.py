@@ -58,7 +58,14 @@ class SegmentationDataset(Dataset):
         image = _load(row["image"])
         segmentation = _load(row["segmentation"])
 
-        image = Image.fromarray(np.asarray(image).astype("uint8"))
+        arr = np.asarray(image).astype("uint8")
+        if arr.ndim == 2:
+            # Single-channel image (OCTA-500 ILM_OPL projections): replicate to 3 channels,
+            # exactly what PIL's convert("RGB") does for mode "L". The SAM/MedSAM processor
+            # rejects 2-D arrays. Cup and GA images are already 3-channel, so this branch
+            # never runs for them (KNOWN_ISSUES K15).
+            arr = np.stack([arr, arr, arr], axis=-1)
+        image = Image.fromarray(arr)
         input_box = [[0.0, 0.0, image.size[0] - 1, image.size[1] - 1]]
         processed = self.processor(images=image, input_boxes=[input_box],
                                    return_tensors="pt")

@@ -138,3 +138,15 @@ still wins, the weighted training loss contributes. Logging only, no extra train
 would go into the MedSAM runs (and any further SAM runs) if adopted.
 **Decision deferred** (C.W.C., 2026-10-16): recorded as an option; runs continue over
 the weekend unchanged.
+
+### K15. FAZ images are single-channel; the paper-era loader cannot read them — FIXED in this repo 2026-10-19; paper-era input files unknown
+The OCTA-500 `OCTA(ILM_OPL)` projections in `uat_old/data/octa500` are 8-bit grayscale
+BMPs (2-D arrays). The SAM/MedSAM processor (transformers 4.47.1) raises
+"Unsupported number of image dimensions: 2" for them, and the paper-era
+`SegmentationDataset.__getitem__` (uat_old and the refactor) is line-for-line the same as
+ours here, so it would have failed the same way. The paper-era FAZ runs therefore used
+different input files (e.g. 3-channel copies; the paper-era CSV is lost, ERRATA E15) or a
+different library version. **Fix:** single-channel images are replicated to 3 channels
+before the processor (identical to PIL `convert("RGB")` for grayscale). 3-channel images
+are untouched, so cup and GA are unaffected. Found when all 80 FAZ jobs failed at the
+first data load (no training happened).
