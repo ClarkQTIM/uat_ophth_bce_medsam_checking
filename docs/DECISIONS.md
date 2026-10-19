@@ -143,3 +143,30 @@ Cliff's δ and bootstrap CIs reported.
   come from the weighted training loss rather than from the stopping criterion.
 - Results under all four criteria are reported for every arm, whatever they show.
 - Same analysis for MedSAM (`medsam_primary`), with Q2/Q3 as the primary questions.
+
+### D18. Supplementary paired-by-seed comparison (added 2026-10-16, after interim data)
+Runs with the same index share a seed and are identical through the end of warmup, so
+each UQ arm can be compared with the baseline seed by seed (mean paired difference,
+Wilcoxon signed-rank). Reported alongside D17's unpaired tests, never instead of them;
+added after seeing the 22-run interim data (docs/records/interim_2026-10-16.md).
+
+### D19. FAZ: new split, seed fixed in advance (2026-10-19, before any FAZ re-run)
+The paper's FAZ split file is lost (ERRATA E15). Decided by C.W.C.: proceed with a new
+split rather than wait for Alpine.
+- Script: the paper-era `create_octa_faz_csv.py`, copied **unchanged** to
+  `scripts/create_octa_faz_csv.py` (SHA-256 05bd4c27…93de, identical to
+  `uat_code/src/misc/`), default ratios 0.5/0.3/0.1/0.1 → 150/90/30/30 of the 300
+  OCTA-500 6 mm pairs (400 × 400), i.e. the paper's sizes.
+- **Seed: 2026**, fixed here before the split was generated or any FAZ run made. Never
+  changed after seeing results; no second split is drawn.
+- OCTA-500 has one image per subject, so the per-image split is also per subject (no
+  leakage of the kind in ERRATA E11).
+- Cells unchanged from the paper (`faz_core_sam.yaml`, `faz_core_medsam.yaml`: baseline,
+  entropy γ4 W2, variance γ4 W3, Conf-0.05 γ1 W1). Conf-0.05 calibrates on 30 images
+  (level ⌈31·0.95⌉/30 = 1.0, allowed).
+- Analysis as D17. **Consequence:** FAZ comparisons with the paper's figures and the
+  paper-era FAZ runs are confounded by the change of test set (the paper's FAZ
+  entropy-vs-baseline gap is only ≈ 0.018), so the D12 FAZ parity check is reported but
+  not decisive; within-split comparisons (Q2, Q3) are valid.
+- If the original split is later found, the FAZ cells are re-run on it and both are
+  reported.
