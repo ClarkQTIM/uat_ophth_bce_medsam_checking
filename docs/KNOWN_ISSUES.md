@@ -80,8 +80,11 @@ GPU non-determinism and the unseeded paper-era runs mean individual runs will
 differ. Comparisons are of distributions (D12).
 
 ### K9. Definition of "validation uncertainty" in Figure 7 — RESOLVED 2026-10-14
-The grid code logged `val_uncertainty` (0.0 during warmup, then the mean map value),
-the same quantity we log (NaN during warmup instead of 0.0).
+The grid code logged `val_uncertainty` as the mean validation uncertainty map from
+epoch 1 (entropy/variance non-zero during warmup; conformal 0 until the first
+calibration). Ours logs the same quantity but only after warmup (NaN before).
+(Corrected 2026-10-15: an earlier note said 0.0 during warmup, which holds only for
+conformal arms.)
 
 Original note:
 The code that logged `val_uncertainty` is lost. We log the mean of the
@@ -111,6 +114,27 @@ Original note:
 ERRATA E14. **Resolve by:** `results/errata_v2` runs with per-epoch tracking, analysed
 with `scripts/select_offline.py` under DECISIONS D17.
 
-### K12. Why did cup γ = 5, W = 1–4 run with unweighted validation? — OPEN, low priority
+### K12. Why did cup γ = 5, W = 1–4 (6 of 8 arms) run with unweighted validation? — OPEN, low priority
 A separate batch with a different code version (E14). Only matters for explaining the
 paper-era data; cup Conf-0.10 (γ5 W1) is the one reported cell affected.
+
+### K13. "Traceback" in every run log — RESOLVED 2026-10-16: harmless
+Python multiprocessing fails to delete a DataLoader worker temp folder at cleanup
+(`multiprocessing/util.py _remove_temp_dir → shutil.rmtree`), a known nuisance on
+network file systems such as `/scratch90`. Runs train and finish normally. To detect a
+run that really died, check for a log without `[done]` whose run folder has no
+`test_metrics.txt` and whose `epoch_log.csv` has stopped growing.
+
+### K14. Is the cup gain the stopping rule or the weighted training loss? — OPEN; possible ablation (NOT implemented)
+*Noted 2026-10-16, after the interim results (docs/records/interim_2026-10-16.md);
+any test of it is post hoc and must be reported as such.*
+Interim cup data suggest entropy-UAT's advantage under the paper-era (weighted)
+stopping rule comes from training longer: a baseline stopped on validation Dice
+reaches the same test Dice. **Possible test:** for every arm, including the baseline,
+also log an entropy-weighted validation loss computed from the model's own predictions
+(γ = 5, the reported entropy cell's γ, W = 1 + γH(p)), and stop on it. If the baseline
+stopped this way matches entropy-UAT, the effect is the stopping rule alone; if UAT
+still wins, the weighted training loss contributes. Logging only, no extra training;
+would go into the MedSAM runs (and any further SAM runs) if adopted.
+**Decision deferred** (C.W.C., 2026-10-16): recorded as an option; runs continue over
+the weekend unchanged.

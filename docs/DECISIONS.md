@@ -119,7 +119,10 @@ three criteria have exhausted patience 5 (max 40 epochs). Because stopping does 
 change training, `scripts/select_offline.py` reproduces exactly what early stopping
 under each criterion would have selected, from one set of runs. A test checks that
 the offline simulation of the primary criterion reproduces the saved checkpoint and
-its test Dice. Runs go to `results/errata_v2`; the 42 runs in `results/errata`
+its test Dice. **Test Dice is logged per epoch only so that the result of each
+stopping rule can be read off afterwards (instead of storing a checkpoint per epoch);
+it is never used to choose anything: every criterion selects its epoch from
+validation values alone.** Runs go to `results/errata_v2`; the 42 runs in `results/errata`
 (previous pipeline, unweighted criterion only) are kept as interim records.
 
 ### D17. Pre-registered analysis of the re-runs (DRAFT, fixed 2026-10-15; to be confirmed by C.W.C. before more results are seen)

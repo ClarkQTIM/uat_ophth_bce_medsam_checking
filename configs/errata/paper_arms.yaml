@@ -13,7 +13,7 @@ cup:   # Figures 1 and 4
   - {uq_type: entropy,   gamma: 5, n_warmup: 5}
   - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
   - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 5}
-  - {uq_type: conformal, alpha: 0.10, gamma: 5, n_warmup: 1, paper_val: unweighted}   # cup g5 W1-4 ran with unweighted validation (ERRATA E14)
+  - {uq_type: conformal, alpha: 0.10, gamma: 5, n_warmup: 1, paper_val: unweighted}   # cup g5 W1-4, 6 of 8 arms incl. this one, ran with unweighted validation (ERRATA E14)
   - {uq_type: conformal, alpha: 0.15, gamma: 1, n_warmup: 1}
   - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
   - {uq_type: conformal, alpha: 0.25, gamma: 2, n_warmup: 2}

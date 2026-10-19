@@ -322,10 +322,27 @@ uncertainty map, with the same γ and formula as training, from epoch 1:
    grows with γ (cup ×1.10, 1.22, 1.29, 1.45 for γ = 1–4).
 3. The γ = 1 cells are already weighted (ratio ≈ 1.2–1.4), an independent
    confirmation of W = 1 + γU (E3).
+4. **The paper-era files record it directly.** Their `loss_parameters.csv` has
+   columns `train_gamma` and `val_gamma`, which neither surviving code version
+   writes. In 4,580 runs `val_gamma` equals γ from epoch 1 while `train_gamma` is
+   blank during warmup: the grid code applied γ to the validation loss from the
+   first epoch. (Checked 2026-10-15 at C.W.C.'s request, who recalled verifying that
+   stopping was unweighted: it is, in both surviving versions — `uat_old`
+   `validate_epoch` and the refactor's `epoch.py`, which carries the comment
+   "CRITICAL: Validation loss is UNWEIGHTED" — but neither produced the figures.)
 
-**Exception:** cup γ = 5, W = 1–4 (all arms) ran with **unweighted** validation
-(epoch-1 entropy ratio ≈ 1.0; cup γ = 5, W = 5 is weighted, ratio 3.1): a batch run
-with a different code version. Of the reported cells, only cup Conf-0.10 (γ5 W1) is
+5. **Reproduced directly (2026-10-15).** The re-runs log both losses. GA entropy
+   γ5 W5, epoch 1: our *weighted* validation loss 1.368 and 1.651 (runs 3, 8) vs the
+   paper-era median 1.52 for that cell; our *unweighted* loss 0.452 and 0.623 vs
+   ≈ 0.58 for the paper-era arms without uncertainty at epoch 1. The paper's logged
+   validation loss is the weighted one.
+
+**Exception:** cup γ = 5, W = 1–4, six of eight arms (entropy, variance, Conf-0.10,
+0.20, 0.25, 0.30; 240 runs) ran with **unweighted** validation: their files have no
+`val_gamma`/`train_gamma` columns (older file format) and their epoch-1 validation
+loss is unweighted (entropy ratio ≈ 1.0; cup γ = 5, W = 5 is weighted, ratio 3.1).
+Conf-0.05 and 0.15 in that block carry `val_gamma` = 5 (weighted). File format and
+loss values agree run for run. Of the reported cells, only cup Conf-0.10 (γ5 W1) is
 affected; `configs/errata/paper_arms.yaml` marks it `paper_val: unweighted`.
 
 **Why it matters.** The baseline has no uncertainty map, so its stopping criterion

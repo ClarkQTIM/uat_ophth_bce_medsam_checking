@@ -21,7 +21,9 @@ Criteria
 Writes to <root>/<dataset>/:
   selections_<backbone>.csv     one row per run x criterion
   summary_<backbone>.csv        per criterion x arm: n, mean, sd, epochs, MW vs baseline
-                                (same criterion), Holm, Cliff's delta, paper runs
+                                (same criterion), Holm, Cliff's delta, paper runs;
+                                supplementary: paired-by-seed mean difference and
+                                Wilcoxon signed-rank P (added 2026-10-16, not in D17)
   verdict_<backbone>.txt        D12 parity (as_run) and D17 questions, in words
 """
 
@@ -135,6 +137,7 @@ def main():
         S.to_csv(os.path.join(out_dir, f"selections_{args.backbone}.csv"), index=False)
 
         summ, lines = [], [f"dataset={dataset} backbone={args.backbone} patience={args.patience}"]
+        from scipy.stats import wilcoxon
         for c in ["as_run", "unweighted", "weighted", "dice"]:
             x = S[S.criterion == c]
             b = x[x.arm == "none"]["test_soft_dice"].values
@@ -149,6 +152,16 @@ def main():
                     r["mw_p"] = mannwhitneyu(d, b, alternative="two-sided").pvalue
                     r["cliffs_delta"] = cliffs_delta(d, b)
                     r["diff_vs_baseline"] = d.mean() - b.mean()
+                # supplementary (added 2026-10-16, after interim data; not part of D17):
+                # paired by seed. Same run index = same seed = identical training through warmup.
+                if arm != "none":
+                    bb = x[x.arm == "none"].set_index("run")["test_soft_dice"]
+                    pd_ = (v.set_index("run")["test_soft_dice"] - bb).dropna()
+                    r["paired_n"] = len(pd_)
+                    if len(pd_):
+                        r["paired_mean_diff"] = pd_.mean()
+                    if len(pd_) >= 2 and (pd_ != 0).any():
+                        r["paired_wilcoxon_p"] = wilcoxon(pd_.values).pvalue
                 if paper is not None and c == "as_run":
                     pr = paper[(paper.dataset == dataset) & (paper.arm == arm)] if arm == "none" else \
                         paper[(paper.dataset == dataset) & (paper.arm == arm) &
@@ -172,6 +185,9 @@ def main():
                 lines.append(f"  {r.arm:18s} g={r.gamma} W={r.n_warmup}: n={r.n:2d} mean {r['mean']:.4f} "
                              f"({r.get('diff_vs_baseline', np.nan):+.4f}) P={r.get('mw_p', np.nan):.3g} "
                              f"Holm={r.get('mw_p_holm', np.nan):.3g} epochs={r.mean_epochs_paper_count:.1f}"
+                             + (f" | paired({int(r.paired_n)}) {r.paired_mean_diff:+.4f}"
+                                f" P={r.get('paired_wilcoxon_p', np.nan):.3g}"
+                                if r.get("paired_n", 0) else "")
                              + (f" | paper runs {r.paper_runs_mean:.4f} P={r.mw_p_vs_paper_runs:.3g}"
                                 if pd.notna(r.get("paper_runs_mean", np.nan)) else ""))
             if c == "as_run" and dataset in ref:
