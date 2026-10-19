@@ -17,6 +17,6 @@ ga:
   expected_counts: {train: 40, test: 50, cal: 10, val: 10}   # paper text says 50/40 train/test
 
 octa:
-  csv: FILL_ME/octa_faz_split.csv     # not yet found
+  csv: /scratch90/chris_/paper_crisis/data/octa_faz_split.csv     # new split, seed 2026 (DECISIONS D19)
   mask_max_value: 255
   expected_counts: {train: 150, test: 90, cal: 30, val: 30}

@@ -1,0 +1,39 @@
+/persist/python_virtual_environments/clachris/.pyenv/versions/dr_ssl_sl/lib/python3.12/site-packages/cuda/pathfinder/_dynamic_libs/search_steps.py:238: UserWarning: Multiple CUDA environment variables are set but differ:
+  CUDA_PATH=/usr/local/cuda-12.6
+  CUDA_HOME=/usr/local/cuda-11.8
+Using CUDA_PATH (highest priority).
+  cuda_home = get_cuda_path_or_home()
+/persist/python_virtual_environments/clachris/.pyenv/versions/dr_ssl_sl/lib/python3.12/site-packages/transformers/utils/hub.py:128: FutureWarning: Using `TRANSFORMERS_CACHE` is deprecated and will be removed in v5 of Transformers. Use `HF_HOME` instead.
+  warnings.warn(
+
+=== cup ===
+  csv: /scratch90/chris_/paper_crisis/data/cup_split.csv
+  sha256: 9e3b79ae64c86ac11b6b8bd4fbaf3ec57c1e34e5cc8035ec84d3b7acf0ce08e0
+  train:  238 (paper 238) ok
+  test :  146 (paper 146) ok
+  cal  :   51 (paper 51) ok
+  val  :   51 (paper 51) ok
+  missing files: 0
+  mask values (sample): [0.0, 255.0] -> binary ok
+
+=== ga ===
+  csv: /scratch90/chris_/paper_crisis/data/ga_split.csv
+  sha256: d129f43c528d73b39e510e3f81dbe7cd683e73dc6bed12ea6be626d999119501
+  train:   40 (paper 40) ok
+  test :   50 (paper 50) ok
+  cal  :   10 (paper 10) ok
+  val  :   10 (paper 10) ok
+  missing files: 0
+  mask values (sample): [0.0, 255.0] -> binary ok
+
+=== octa ===
+  csv: /scratch90/chris_/paper_crisis/data/octa_faz_split.csv
+  sha256: 01cfc28d6c287ecdee8884ee1bfc4dc7fb0e590fd79117df8f3f1481bd950c30
+  train:  150 (paper 150) ok
+  test :   90 (paper 90) ok
+  cal  :   30 (paper 30) ok
+  val  :   30 (paper 30) ok
+  missing files: 0
+  mask values (sample): [0.0, 255.0] -> binary ok
+
+ALL CHECKS PASSED
