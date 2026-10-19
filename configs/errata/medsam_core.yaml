@@ -1,0 +1,24 @@
+# PRIORITY subset of medsam_primary (2026-10-19): the same 8 cells as parity_sam_core
+# (cup and GA: baseline, entropy, variance, the conformal arm shown in Figures 1-2),
+# on MedSAM, 10 runs each = 80 runs. Cells carried over UNCHANGED from the paper
+# (no re-tuning on MedSAM). Same output folder as medsam_primary.yaml, so these runs
+# count towards it. Analysis: DECISIONS D17 (Q2/Q3 primary for MedSAM).
+name: medsam_core
+backbones: [medsam]
+runs: [1, 10]
+output_root: results/errata_v2
+common:
+  weight_form: paper
+  val_weighting: none
+  track_all_criteria: true
+arms:
+  cup:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
+  ga:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 5, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.25, gamma: 4, n_warmup: 2}

@@ -100,7 +100,14 @@ The paper-era code used SAM's processor. We use each backbone's own processor.
 `inspect_backbone.py` records both; document the difference in the erratum if
 there is one.
 
-### K11. Does UAT improve Dice under a common stopping criterion? — OPEN (central)
+### K11. Does UAT improve Dice under a common stopping criterion? — ANSWERED for SAM ViT-H cup and GA (2026-10-19); OPEN for MedSAM and FAZ
+SAM ViT-H, n = 10 per arm, validation-Dice stopping for every arm (D17 Q3):
+cup entropy +0.004 (P = 0.31) — **no gain**; GA entropy +0.065 (P = 0.005, Holm 0.014)
+— **gain**. Details: docs/records/core_sam_2026-10-19/RESULTS.md; ERRATA E14.
+Next: `configs/errata/medsam_core.yaml` (same 80 cells on MedSAM); FAZ when its split
+file is found.
+
+Original note:
 ERRATA E14. **Resolve by:** `results/errata_v2` runs with per-epoch tracking, analysed
 with `scripts/select_offline.py` under DECISIONS D17.
 

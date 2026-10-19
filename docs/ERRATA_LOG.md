@@ -302,7 +302,7 @@ results (Figures 1–6) are not affected.
 
 ---
 
-## E14. Early stopping used the uncertainty-weighted validation loss, not the unweighted loss the Methods state — CONFIRMED from training logs (code lost); impact on the main claim under test
+## E14. Early stopping used the uncertainty-weighted validation loss, not the unweighted loss the Methods state — CONFIRMED from training logs (code lost); impact tested on SAM ViT-H 2026-10-19 (cup gain not supported under a common criterion; GA gain holds)
 
 *Found 2026-10-15 (docs/records/interim_2026-10-15.md).*
 
@@ -336,12 +336,31 @@ average **0.672** and **6.7 epochs**, below the paper's cup baseline (0.705, fig
 reading). Caveat: those cells also differ in γ/W and possibly in other code details.
 Our interim re-runs with unweighted validation agree in direction (small n): in 2 of
 4 cup entropy runs and 2 of 2 GA entropy runs, early stopping selected a checkpoint
-from inside the warmup, i.e. a model identical to the baseline of the same seed.
+from inside the warmup, i.e. a model trained identically to the baseline of the same
+seed (possibly stopped at a different epoch). *(Wording corrected 2026-10-19: the
+earlier text said "identical to the baseline", which holds only when both stop at the
+same epoch.)*
 
-**What is not yet known:** whether entropy-UAT improves Dice when every arm is stopped
-by the same criterion. The reported gains may be largely an effect of the weighted
-stopping criterion (which lets UAT arms train longer), not of the weighted training
-loss. Tested by the re-runs under the pre-registered analysis in DECISIONS D17.
+**Tested 2026-10-19 (SAM ViT-H, cup and GA, n = 10 per arm;
+docs/records/core_sam_2026-10-19/RESULTS.md).**
+- Under the as-run (weighted) criterion the re-runs match the paper's own runs in all
+  six UQ cells (P = 0.31–0.97) and reproduce the reported gains (cup entropy +0.059,
+  GA entropy +0.093 over baseline).
+- **Cup:** with validation-Dice stopping for every arm, the baseline reaches 0.781 and
+  entropy-UAT 0.785 (+0.004, P = 0.31). The reported cup gain is explained by the
+  stopping criterion (baseline stopped at epoch ≈ 6 under BCE vs ≈ 19 under Dice), not
+  by uncertainty-aware training. Variance +0.010 (P = 0.017, Holm 0.052).
+- **GA:** with validation-Dice stopping, entropy-UAT 0.813 vs baseline 0.749 (+0.065,
+  P = 0.005, Holm 0.014). A real gain, smaller than reported (+0.097).
+- **The Methods' stated rule could not have produced the reported entropy results:**
+  with unweighted-BCE stopping, the entropy arm selects a checkpoint from inside warmup
+  (never trained with UAT) in 10/10 cup and 4/10 GA runs.
+- Pre-registered D17 verdict (entropy > baseline under both stated and common
+  criteria): not upheld for either dataset on SAM ViT-H; GA upheld under the common
+  criterion alone.
+- Still to test: MedSAM (`medsam_core`), FAZ.
 
 **Action:** correct the Methods statement; report results under a common stopping
-criterion (D17) alongside the as-run criterion.
+criterion (D17) alongside the as-run criterion; the cup result must be described as
+not supported under a common stopping criterion (pending MedSAM, which is the model
+the paper names).

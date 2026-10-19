@@ -88,6 +88,19 @@ python scripts/compare_arms.py --root results/errata --backbone sam_vit_huge --l
 Compare the γ = 1 arms under `weighted_bce_v2` (paper formula, from step 3) and
 `weighted_bce_v2_gm1` (no weighting) with the paper's Table and Figures 4 and 6.
 
+## 5a. MedSAM core first (80 runs; started 2026-10-19 after the SAM core finished)
+
+Same 8 cells as `parity_sam_core`, on MedSAM (≈ 9 GB per run, so several per GPU).
+Screens, 4 per GPU, each a slice of 10 lines (lines alternate cup/GA per run index):
+
+```bash
+python scripts/make_jobs.py configs/errata/medsam_core.yaml --out jobs/medsam_core.jsonl
+screen -dmS m0 bash -c "scripts/run_local.sh jobs/medsam_core.jsonl 0 0 9"
+screen -dmS m1 bash -c "scripts/run_local.sh jobs/medsam_core.jsonl 0 10 19"
+# ... m2..m7: GPU 0 for 20-39, GPU 1 for 40-79
+python scripts/select_offline.py --root results/errata_v2 --backbone medsam
+```
+
 ## 5. MedSAM primary: the erratum's evidence (260 runs)
 
 ```bash
