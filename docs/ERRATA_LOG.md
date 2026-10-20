@@ -23,7 +23,7 @@ indirect evidence; confirmation pending) · OPEN (unresolved) · NOT AN ERROR
 
 ---
 
-## E1. The backbone was SAM ViT-H, not MedSAM — LIKELY (confirmation pending)
+## E1. The backbone was SAM ViT-H, not MedSAM — CONFIRMED by reproduction 2026-10-20 (code path certain; no paper-era checkpoint survives)
 
 *Found 2026-10-14.*
 
@@ -63,6 +63,15 @@ ViT-H (`parity_sam.yaml`) shows the new pipeline is faithful.
 **Guardrail added:** `src/uatcheck/backbones.py` asserts the parameter count of
 the loaded model matches the requested backbone and records repo id, parameter
 count, and processor settings in every run's `run_manifest.json`.
+
+**Confirmed by reproduction (2026-10-20).** The same 6 reported UQ cells (cup and GA:
+entropy, variance, the figures' conformal arm), procedure as run, 10 runs each, compared
+with the paper's own 10 runs per cell (Mann-Whitney):
+SAM ViT-H re-runs P = 0.31–0.97 in all six (indistinguishable);
+MedSAM re-runs P = 0.0013–0.068, five of six P < 0.05, and lower in every cell
+(e.g. GA entropy 0.767 vs 0.824, P = 0.002; cup entropy 0.770 vs 0.781, P = 0.011).
+The published numbers are SAM ViT-H numbers.
+(docs/records/core_sam_2026-10-19/, docs/records/core_medsam_2026-10-20/)
 
 ---
 
@@ -405,3 +414,9 @@ could change it by a comparable amount.
 
 **Action:** re-runs use a new split from the same script with a seed fixed in advance
 (DECISIONS D19). The erratum should state that the original FAZ split was not preserved.
+
+**Status 2026-10-19 evening:** FAZ re-runs on the new split were **paused** (C.W.C.) to
+give MedSAM core the GPUs and to give the Alpine search for the original split a chance.
+The 5 completed new-split runs (MedSAM) are kept separately in
+`results/faz_newsplit_seed2026/` so that they cannot mix with any original-split runs in
+`results/errata_v2/`.
