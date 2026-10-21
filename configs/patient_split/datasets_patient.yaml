@@ -1,0 +1,9 @@
+# Patient-level re-splits (DECISIONS D20). Same images as configs/datasets.yaml,
+# re-split by scripts/make_patient_split.py --seed 1020. Dataset keys stay "ga" and "cup"
+# so result folders mirror results/errata_v2 arm for arm. CSVs stay in data/ (gitignored).
+ga:
+  csv: /scratch90/chris_/paper_crisis/data/ga_patient_split.csv
+  mask_max_value: 255
+cup:
+  csv: /scratch90/chris_/paper_crisis/data/cup_patient_split.csv
+  mask_max_value: 255

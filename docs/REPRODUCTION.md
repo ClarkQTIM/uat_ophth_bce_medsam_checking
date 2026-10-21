@@ -112,6 +112,16 @@ python scripts/make_jobs.py configs/errata/faz_core_medsam.yaml --out jobs/faz_c
 python scripts/make_jobs.py configs/errata/faz_core_sam.yaml --out jobs/faz_core_sam.jsonl
 ```
 
+## 5c. Patient-level split sensitivity (DECISIONS D20)
+
+```bash
+python scripts/make_patient_split.py --dataset ga  --in data/ga_split.csv  --out data/ga_patient_split.csv  --seed 1020
+python scripts/make_patient_split.py --dataset cup --in data/cup_split.csv --out data/cup_patient_split.csv --seed 1020
+python scripts/make_jobs.py configs/patient_split/medsam_patient.yaml \
+    --datasets configs/patient_split/datasets_patient.yaml --out jobs/patient_medsam.jsonl
+python scripts/select_offline.py --root results/patient_split_v1 --backbone medsam
+```
+
 ## 5. MedSAM primary: the erratum's evidence (260 runs)
 
 ```bash

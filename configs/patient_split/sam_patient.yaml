@@ -1,0 +1,24 @@
+# Patient-level split sensitivity run (DECISIONS D20), sam-vit-huge.
+# The same 8 cells as configs/errata/parity_sam_core.yaml, unchanged, 10 runs each = 80 runs.
+# Output goes to a SEPARATE root (results/patient_split_v1) whose layout mirrors
+# results/errata_v2, so every arm can be compared with its per-image-split twin.
+# make_jobs: --datasets configs/patient_split/datasets_patient.yaml
+name: patient_split_sam
+backbones: [sam-vit-huge]
+runs: [1, 10]
+output_root: results/patient_split_v1
+common:
+  weight_form: paper
+  val_weighting: none
+  track_all_criteria: true
+arms:
+  ga:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 5, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.25, gamma: 4, n_warmup: 2}
+  cup:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: sam_var,   gamma: 3, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}

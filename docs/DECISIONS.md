@@ -173,3 +173,25 @@ split rather than wait for Alpine.
   not decisive; within-split comparisons (Q2, Q3) are valid.
 - If the original split is later found, the FAZ cells are re-run on it and both are
   reported.
+
+### D20. Patient-level split sensitivity run (fixed 2026-10-20, before the splits were generated)
+ERRATA E11: the paper's splits are per image (GA: 23 of 73 patients in more than one
+split; cup: 140 of 244). Question: do the results, above all the GA entropy gain, hold
+when no patient is in more than one split?
+- **Splits:** `scripts/make_patient_split.py --seed 1020`, applied to the paper's own split
+  CSVs (`data/ga_split.csv`, `data/cup_split.csv`). Same images; patient ID from the file
+  name (GA `_Final_<site>_<patient>_…`, 73 patients; PAPILA `RET<id>`, 244); target split
+  sizes = the paper's. Written to `data/{ga,cup}_patient_split.csv` (gitignored); counts
+  and SHA-256 recorded in docs/records when generated. **Seed 1020 is fixed here and never
+  changed; no second split is drawn.**
+- **Runs:** the same 8 cells as `medsam_core` / `parity_sam_core` (no re-tuning), 10 runs
+  each, seeds 1001–1010. MedSAM first (`configs/patient_split/medsam_patient.yaml`, 80 runs);
+  SAM ViT-H (`sam_patient.yaml`, 80 runs) when GPU time allows.
+- **Output:** a separate root, `results/patient_split_v1/`, with the same layout as
+  `results/errata_v2/`, so each arm has a per-image-split twin.
+- **Analysis:** `scripts/select_offline.py --root results/patient_split_v1`, exactly as D17
+  (as_run, Q2, Q3; Holm; paired by seed as supplementary). Primary question: **does entropy
+  beat the baseline under Q3 (validation-Dice stopping) on the patient-level split**, per
+  dataset and backbone. Secondary: the Δ (arm − baseline) under each split type, side by
+  side. Absolute Dice is expected to be lower on the patient split (leakage removed) and is
+  not itself the question; the test sets differ, so arms are compared within a split only.
