@@ -7,7 +7,7 @@ Re-split an existing split CSV so that every patient is in exactly one split
   python scripts/make_patient_split.py --dataset cup --in data/cup_split.csv --out data/cup_patient_split.csv --seed 1020
 
 Patient ID from the image file name:
-  ga  : "_Final_<site>_<patient>_..."  -> "<site>_<patient>"   (73 patients expected)
+  ga  : "_Final_<site>_<patient>_..."  -> "<patient>"          (73 patients expected)
   cup : "RET<id>OD" / "RET<id>OS"      -> "RET<id>"             (244 patients expected)
 
 Assignment (deterministic for a given seed): patients are shuffled with the seed,
@@ -27,7 +27,10 @@ import numpy as np
 import pandas as pd
 
 PATTERNS = {
-    "ga": (re.compile(r"_Final_([^_/]+)_([^_/]+)_"), lambda m: f"{m.group(1)}_{m.group(2)}", 73),
+    # GA: patient number alone. One patient number occurs under both site labels
+    # (axis01, AxisUCH01); keying on site+patient gives 74, patient alone gives the
+    # paper's 73 (DECISIONS D20, amendment 2026-10-20).
+    "ga": (re.compile(r"_Final_([^_/]+)_([^_/]+)_"), lambda m: m.group(2), 73),
     "cup": (re.compile(r"(RET\d+)O[DS]", re.IGNORECASE), lambda m: m.group(1).upper(), 244),
 }
 ORDER = ["train", "test", "val", "cal"]

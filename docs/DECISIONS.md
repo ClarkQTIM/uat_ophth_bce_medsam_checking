@@ -195,3 +195,9 @@ when no patient is in more than one split?
   dataset and backbone. Secondary: the Δ (arm − baseline) under each split type, side by
   side. Absolute Dice is expected to be lower on the patient split (leakage removed) and is
   not itself the question; the test sets differ, so arms are compared within a split only.
+- **Amendment (2026-10-20, before the GA split was generated):** keying GA patients on
+  site + patient gave 74, not 73: one patient number occurs under both site labels
+  (`axis01`, `AxisUCH01`; 65 and 45 images). Keyed on the patient number alone the count is
+  73, the paper's number, so that patient is treated as one person and kept in one split.
+  The cup split (244 patients, 140 → 0 crossing splits, SHA-256 4affa22c…43ce) was
+  generated first and is unaffected.
