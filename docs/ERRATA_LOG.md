@@ -13,7 +13,7 @@ co-author or editor can follow it without any other context.
 | Name | Location | What it is |
 |---|---|---|
 | `uat_old` | `/scratch90/chris_/uat_dice/uat_old/src` | Oldest surviving training code (`train.py`, ~1,500 lines). Learnable γ. |
-| grid code | lost (possibly on Alpine) | The code that ran the paper's fixed γ × W grid (`weighted_bce_v2`). |
+| grid code | lost (Alpine checked 2026-10-22: empty) | The code that ran the paper's fixed γ × W grid (`weighted_bce_v2`). |
 | refactor | `/scratch90/chris_/uat_dice/src` | Later modular rewrite (made with a coding assistant). Fixed γ. |
 | this repo | `paper_crisis` | Re-implementation for verification and re-runs. |
 
@@ -393,7 +393,7 @@ the paper names).
 
 ---
 
-## E15. The FAZ split cannot be recovered — CONFIRMED on ophlappc05 and /persist (Alpine not yet checked)
+## E15. The FAZ split cannot be recovered — CONFIRMED (ophlappc05, /persist, and Alpine checked 2026-10-22)
 
 *Found 2026-10-19.*
 
@@ -406,7 +406,8 @@ so without the CSV or the seed the split cannot be regenerated. No FAZ/OCTA spli
 exists on ophlappc05 (`/scratch90`) or under `/persist/QTIM/Active/22-2198`; the shell
 history has no record of the command; the paper-era FAZ run folders hold
 `loss_parameters.csv`, `test_metrics.txt` and a few saved epoch images, not the image list.
-Alpine (`/projects`, `/scratch`) not yet checked; scratch is purged automatically.
+Alpine (`/projects`, `/scratch`) checked by C.W.C. on 2026-10-22: empty. The original FAZ split
+and the grid code are lost for good.
 
 **Why it matters:** the published FAZ results cannot be re-run on the same test set.
 The paper's FAZ entropy gain (0.907 vs 0.888) is small enough that a different split
@@ -420,3 +421,8 @@ give MedSAM core the GPUs and to give the Alpine search for the original split a
 The 5 completed new-split runs (MedSAM) are kept separately in
 `results/faz_newsplit_seed2026/` so that they cannot mix with any original-split runs in
 `results/errata_v2/`.
+
+**Status 2026-10-22:** Alpine is empty, so D19 applies: FAZ is re-run on the new split
+(seed 2026) for both backbones. The 5 completed new-split MedSAM runs in
+`results/faz_newsplit_seed2026/` belong to this split and are moved back into
+`results/errata_v2/octa/` before relaunching.

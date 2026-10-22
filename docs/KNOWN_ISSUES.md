@@ -152,3 +152,14 @@ different library version. **Fix:** single-channel images are replicated to 3 ch
 before the processor (identical to PIL `convert("RGB")` for grayscale). 3-channel images
 are untouched, so cup and GA are unaffected. Found when all 80 FAZ jobs failed at the
 first data load (no training happened).
+
+### K16. What the loss of the Alpine files leaves unresolved — RECORDED 2026-10-22
+Alpine (`/projects`, `/scratch`) is empty (checked by C.W.C.). With the grid code and the
+original FAZ split gone, these can no longer be settled from artifacts:
+- K2 (entropy normalised by ln 2 in the grid?): only by an empirical check (optional).
+- K3 (how the paper got variance-arm test metrics): unresolvable; low impact.
+- E13 (why the Table's convergence numbers differ from the runs behind the figures):
+  cause stays unknown.
+- E15 (FAZ split): the published FAZ results cannot be re-run on their own test set.
+Not affected: E1 (confirmed by reproduction), E14 (confirmed from the surviving logs and by
+reproduction), and every re-run result, which rests only on surviving data and new runs.
