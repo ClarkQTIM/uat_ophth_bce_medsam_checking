@@ -69,3 +69,9 @@ Q2: entropy selects a warmup checkpoint in 2/10 runs.
 
 Final numbers for cup Conf-0.20 (n = 10) will replace the interim n = 8 when the last two
 runs finish; no other cell is affected.
+
+## Final (80/80), 2026-10-23
+
+The two remaining cup Conf-0.20 runs finished; tables in `final_80/`. Cup Conf-0.20 (n = 10):
+as run 0.700 (−0.001 vs baseline, P = 0.52), Q2 0.713 (+0.012, P = 0.35), Q3 0.760
+(−0.000, P = 0.85). Every other cell is unchanged, and so are all conclusions above.

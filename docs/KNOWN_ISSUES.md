@@ -110,7 +110,10 @@ Validation-Dice stopping for every arm (D17 Q3), n = 10 per arm:
 - MedSAM: cup entropy +0.014 (P = 0.054, Holm 0.11) — no significant gain; GA entropy
   +0.049 (P = 0.006, Holm 0.017) — gain.
 Details: docs/records/core_sam_2026-10-19/, docs/records/core_medsam_2026-10-20/;
-ERRATA E14. FAZ paused pending the original split (ERRATA E15).
+- FAZ, MedSAM, seed-2026 split (39/40): entropy +0.009 (P = 0.006, Holm 0.017) — small gain.
+- Patient-level splits, MedSAM (D20): GA entropy +0.026 (P = 0.064, Holm 0.19; paired
+  P = 0.006) — gain shrinks and loses significance; cup +0.017 (P = 0.12).
+ERRATA E14. Details: docs/records/patient_split_2026-10-23/RESULTS.md. Still running: FAZ SAM.
 
 Original note:
 ERRATA E14. **Resolve by:** `results/errata_v2` runs with per-epoch tracking, analysed

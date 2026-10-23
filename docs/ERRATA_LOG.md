@@ -272,6 +272,15 @@ FAZ (OCTA-500) to be checked once its split file is found.
 
 ---
 
+**Sensitivity analysis done (2026-10-23, MedSAM, DECISIONS D20;
+docs/records/patient_split_2026-10-23/RESULTS.md).** Same images re-split by patient (seed
+1020). Under the common stopping rule the GA entropy gain falls from +0.049 (P = 0.006) on
+the per-image split to +0.026 (P = 0.064) on the patient-level split; cup stays a small,
+non-significant trend (+0.014 → +0.017). The per-image splits therefore matter for the one
+claim that had survived: the GA effect is not robustly significant on clean splits.
+(The two split types were also run on different GPU types, A100 vs H100; the test sets differ.)
+
+
 ## E12. "Final Gamma: 5.000000" in baseline results — NOT AN ERROR (artifact)
 
 *Found 2026-10-14.* Paper-era baseline `test_metrics.txt` files end with
