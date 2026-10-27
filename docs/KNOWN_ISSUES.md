@@ -103,17 +103,19 @@ The paper-era code used SAM's processor. We use each backbone's own processor.
 `inspect_backbone.py` records both; document the difference in the erratum if
 there is one.
 
-### K11. Does UAT improve Dice under a common stopping criterion? — ANSWERED for cup and GA on SAM ViT-H (2026-10-19) and MedSAM (2026-10-20); OPEN for FAZ
+### K11. Does UAT improve Dice under a common stopping criterion? — ANSWERED (cup, GA: 2026-10-19/20; FAZ: 2026-10-26)
 Validation-Dice stopping for every arm (D17 Q3), n = 10 per arm:
 - SAM ViT-H: cup entropy +0.004 (P = 0.31) — no gain; GA entropy +0.065 (P = 0.005,
   Holm 0.014) — gain.
 - MedSAM: cup entropy +0.014 (P = 0.054, Holm 0.11) — no significant gain; GA entropy
   +0.049 (P = 0.006, Holm 0.017) — gain.
 Details: docs/records/core_sam_2026-10-19/, docs/records/core_medsam_2026-10-20/;
-- FAZ, MedSAM, seed-2026 split (39/40): entropy +0.009 (P = 0.006, Holm 0.017) — small gain.
+- FAZ, seed-2026 split (final, 2026-10-26): MedSAM entropy +0.009 (P = 0.006, Holm 0.017) —
+  small gain; SAM ViT-H +0.005 (P = 0.39) — no significant gain
+  (docs/records/faz_final_2026-10-26/RESULTS.md).
 - Patient-level splits, MedSAM (D20): GA entropy +0.026 (P = 0.064, Holm 0.19; paired
   P = 0.006) — gain shrinks and loses significance; cup +0.017 (P = 0.12).
-ERRATA E14. Details: docs/records/patient_split_2026-10-23/RESULTS.md. Still running: FAZ SAM.
+ERRATA E14. Details: docs/records/patient_split_2026-10-23/RESULTS.md. All planned runs complete.
 
 Original note:
 ERRATA E14. **Resolve by:** `results/errata_v2` runs with per-epoch tracking, analysed

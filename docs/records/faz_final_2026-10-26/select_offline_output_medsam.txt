@@ -1,0 +1,23 @@
+dataset=octa backbone=medsam patience=5
+
+[as_run] baseline n=10 mean 0.9012
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9052 (+0.0040) P=0.186 Holm=0.186 epochs=23.8 | paired(10) +0.0040 P=0.16 | paper runs 0.8918 P=0.00459
+  entropy            g=4 W=2: n=10 mean 0.9162 (+0.0150) P=0.000183 Holm=0.000548 epochs=19.7 | paired(10) +0.0150 P=0.00195 | paper runs 0.9067 P=0.00171
+  sam_var            g=4 W=3: n=10 mean 0.8902 (-0.0110) P=0.0539 Holm=0.108 epochs=21.1 | paired(10) -0.0110 P=0.0195 | paper runs 0.8980 P=0.345
+  D12 parity: baseline FAIL, entropy ok, entropy>baseline ok -> FAIL
+
+[unweighted] baseline n=10 mean 0.9012
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9007 (-0.0005) P=0.678 Holm=0.855 epochs=20.9 | paired(10) -0.0005 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.9049 (+0.0037) P=0.427 Holm=0.855 epochs=14.8 | paired(10) +0.0037 P=0.432
+  sam_var            g=4 W=3: n=10 mean 0.8902 (-0.0110) P=0.0539 Holm=0.162 epochs=21.1 | paired(10) -0.0110 P=0.0195
+
+[weighted] baseline n=10 mean 0.9012
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9052 (+0.0040) P=0.186 Holm=0.186 epochs=23.8 | paired(10) +0.0040 P=0.16
+  entropy            g=4 W=2: n=10 mean 0.9162 (+0.0150) P=0.000183 Holm=0.000548 epochs=19.7 | paired(10) +0.0150 P=0.00195
+  sam_var            g=4 W=3: n=10 mean 0.8902 (-0.0110) P=0.0539 Holm=0.108 epochs=21.1 | paired(10) -0.0110 P=0.0195
+
+[dice] baseline n=10 mean 0.9113
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9115 (+0.0002) P=0.85 Holm=1 epochs=29.3 | paired(10) +0.0002 P=0.695
+  entropy            g=4 W=2: n=10 mean 0.9201 (+0.0088) P=0.0058 Holm=0.0174 epochs=27.3 | paired(10) +0.0088 P=0.00391
+  sam_var            g=4 W=3: n=10 mean 0.9065 (-0.0048) P=0.791 Holm=1 epochs=32.4 | paired(10) -0.0048 P=0.922
+

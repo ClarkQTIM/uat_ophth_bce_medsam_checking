@@ -47,7 +47,7 @@ Variance and Conf-0.25 on the patient split: Q3 −0.019 and −0.010 (P ≥ 0.7
 Q2 on the patient split: entropy again selects a warmup (pre-UAT) checkpoint in 8/10 runs.
 Variance and Conf-0.20: Q3 +0.000 and −0.004; no gain.
 
-## FAZ, seed-2026 split (H100), MedSAM — interim, 39/40
+## FAZ, seed-2026 split (H100), MedSAM — interim, 39/40 (final for both backbones: docs/records/faz_final_2026-10-26/)
 
 | Criterion | Baseline | Entropy γ4 W2 | Δ | P (Holm) | paired P |
 |---|---|---|---|---|---|
