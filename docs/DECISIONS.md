@@ -201,3 +201,33 @@ when no patient is in more than one split?
   73, the paper's number, so that patient is treated as one person and kept in one split.
   The cup split (244 patients, 140 → 0 crossing splits, SHA-256 4affa22c…43ce) was
   generated first and is unaffected.
+
+### D21. 3-class UAT on MedSAM (PAPILA background / rim / cup) — fixed 2026-10-27, before any run
+New research (the paper was binary), so it is designed from the errata lessons rather than
+copied from the paper's cells.
+- **Data:** PAPILA `combined_segmentation` (STAPLE fused; 0 = background, 127 = rim,
+  255 = cup; checked 2026-10-27: its cup equals the STAPLE cup and its rim equals disc minus
+  cup exactly). Disc = rim + cup. **Patient-level split from D20** (`data/cup_patient_split.csv`,
+  seed 1020).
+- **Model and loss:** MedSAM; the three multimask tokens are read as the three class logits,
+  softmax; cross-entropy weighted per pixel by W = 1 + γU (paper formula); U not detached;
+  warmup and conformal recalibration as in the binary pipeline.
+- **Arms:** baseline; entropy (3-class, natural log, max ln 3); conformal LAC (α = 0.20, the
+  binary cup's reported α; U = 1 where the prediction set has ≥ 2 classes). **No variance
+  arm** (the tokens are the classes).
+- **Tuning on validation only** (avoids ERRATA E7): grid entropy γ ∈ {1, 3, 5} × W ∈ {2, 5};
+  conformal γ ∈ {1, 3, 5} × W ∈ {1, 3}; 3 tuning seeds (2001–2003), output
+  `results/multiclass_tune_v1/`. Per arm, `scripts/select_cell.py` picks the cell with the
+  highest mean validation mean-Dice at the validation-Dice-selected epoch (patience 5); ties to
+  smaller γ, then smaller W. Test Dice is not read. It writes `configs/multiclass/final.yaml`.
+- **Final runs:** baseline + the chosen entropy and conformal cells, 10 seeds (1001–1010),
+  output `results/multiclass_v1/`.
+- **Stopping:** primary = validation mean soft Dice of cup and disc (the common rule, D17 Q3);
+  unweighted and weighted validation CE also logged every epoch and analysed offline.
+- **Outcomes:** primary = **test cup soft Dice** (comparable with the binary results);
+  secondary = disc and mean (cup, disc) soft Dice, hard Dice, uncertainty–error AUROC.
+- **Analysis:** `scripts/select_offline.py --root results/multiclass_v1 --loss_dir weighted_ce
+  --test_col test_cup_soft_dice` (and `test_disc_soft_dice`), D17 statistics (Mann-Whitney vs
+  baseline, Holm across the 2 UQ arms, paired by seed as supplementary). The claim "3-class UAT
+  improves cup Dice" holds only if entropy or conformal beats the baseline with Holm P < 0.05
+  under the validation-Dice rule.

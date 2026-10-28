@@ -1,0 +1,4 @@
+# 3-class PAPILA (DECISIONS D21): STAPLE-fused map in `combined_segmentation`,
+# 0 = background, 127 = rim, 255 = cup. Patient-level split from D20 (seed 1020).
+papila3:
+  csv: /scratch90/chris_/paper_crisis/data/cup_patient_split.csv

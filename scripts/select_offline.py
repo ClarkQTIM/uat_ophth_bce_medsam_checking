@@ -85,6 +85,9 @@ def main():
     ap.add_argument("--arms", default="configs/errata/paper_arms.yaml")
     ap.add_argument("--reference", default="configs/errata/paper_reference.yaml")
     ap.add_argument("--paper_runs", default="docs/records/paper_era_runs.csv")
+    ap.add_argument("--test_col", default="test_soft_dice",
+                    help="epoch_log column used as the outcome (multi-class: test_cup_soft_dice, ...)")
+    ap.add_argument("--suffix", default="", help="added to output file names")
     args = ap.parse_args()
     from scipy.stats import mannwhitneyu
 
@@ -126,7 +129,7 @@ def main():
                              "run": int(run), "criterion": c, "best_epoch": be, "stop_epoch": stop,
                              "epochs_paper_count": (stop - 1) if stop else len(ep),
                              "epochs_run": len(ep),
-                             "test_soft_dice": float(r["test_soft_dice"]),
+                             "test_soft_dice": float(r[args.test_col]),
                              "test_hard_dice": float(r["test_hard_dice"]),
                              "val_soft_dice": float(r["val_soft_dice"])})
         if not rows:
@@ -134,9 +137,9 @@ def main():
             continue
         S = pd.DataFrame(rows)
         out_dir = os.path.join(args.root, dataset)
-        S.to_csv(os.path.join(out_dir, f"selections_{args.backbone}.csv"), index=False)
+        S.to_csv(os.path.join(out_dir, f"selections_{args.backbone}{args.suffix}.csv"), index=False)
 
-        summ, lines = [], [f"dataset={dataset} backbone={args.backbone} patience={args.patience}"]
+        summ, lines = [], [f"dataset={dataset} backbone={args.backbone} patience={args.patience} outcome={args.test_col}"]
         from scipy.stats import wilcoxon
         for c in ["as_run", "unweighted", "weighted", "dice"]:
             x = S[S.criterion == c]
@@ -200,10 +203,10 @@ def main():
                     lines.append(f"  D12 parity: baseline {'ok' if ok_b else 'FAIL'}, entropy "
                                  f"{'ok' if ok_e else 'FAIL'}, entropy>baseline {'ok' if ok_s else 'FAIL'}"
                                  f" -> {'PASS' if ok_b and ok_e and ok_s else 'FAIL'}")
-        pd.concat(summ).to_csv(os.path.join(out_dir, f"summary_{args.backbone}.csv"), index=False)
+        pd.concat(summ).to_csv(os.path.join(out_dir, f"summary_{args.backbone}{args.suffix}.csv"), index=False)
         txt = "\n".join(lines)
         print(txt + "\n")
-        with open(os.path.join(out_dir, f"verdict_{args.backbone}.txt"), "w") as f:
+        with open(os.path.join(out_dir, f"verdict_{args.backbone}{args.suffix}.txt"), "w") as f:
             f.write(txt + "\n")
 
 

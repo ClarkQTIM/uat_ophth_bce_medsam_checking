@@ -1,0 +1,28 @@
+# Validation-only tuning of gamma and n_warmup for 3-class UAT (DECISIONS D21).
+# 3 tuning seeds (base_seed 2000 -> 2001..2003; the final runs use 1001..1010).
+# 12 cells x 3 seeds = 36 runs. Selection: scripts/select_cell.py (val Dice only).
+name: multiclass_tune
+backbones: [medsam]
+runs: [1, 3]
+output_root: results/multiclass_tune_v1
+common:
+  task: multiclass
+  label_column: combined_segmentation
+  label_values: [0, 127, 255]
+  base_seed: 2000
+  primary_criterion: dice
+  weight_form: paper
+arms:
+  papila3:
+    - {uq_type: entropy, gamma: 1, n_warmup: 2}
+    - {uq_type: entropy, gamma: 3, n_warmup: 2}
+    - {uq_type: entropy, gamma: 5, n_warmup: 2}
+    - {uq_type: entropy, gamma: 1, n_warmup: 5}
+    - {uq_type: entropy, gamma: 3, n_warmup: 5}
+    - {uq_type: entropy, gamma: 5, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.20, gamma: 1, n_warmup: 1}
+    - {uq_type: conformal, alpha: 0.20, gamma: 3, n_warmup: 1}
+    - {uq_type: conformal, alpha: 0.20, gamma: 5, n_warmup: 1}
+    - {uq_type: conformal, alpha: 0.20, gamma: 1, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.20, gamma: 3, n_warmup: 3}
+    - {uq_type: conformal, alpha: 0.20, gamma: 5, n_warmup: 3}

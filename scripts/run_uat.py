@@ -20,6 +20,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
 
 from uatcheck.train_uat import train_one_run  # noqa: E402
+from uatcheck.train_multiclass import train_one_run as train_one_run_mc  # noqa: E402
 
 
 def parse_value(v):
@@ -64,7 +65,10 @@ def main():
     if not cfg:
         ap.error("give --jobs or --config")
     print("[config]", json.dumps(cfg, indent=2))
-    train_one_run(cfg)
+    if cfg.get("task") == "multiclass":       # 3-class UAT (DECISIONS D21)
+        train_one_run_mc(cfg)
+    else:
+        train_one_run(cfg)
 
 
 if __name__ == "__main__":

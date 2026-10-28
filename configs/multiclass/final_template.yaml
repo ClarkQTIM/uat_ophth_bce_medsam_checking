@@ -1,0 +1,14 @@
+# Template for the final 3-class runs (DECISIONS D21). scripts/select_cell.py fills
+# `arms` (baseline + the validation-chosen cell of each UQ arm) -> final.yaml.
+name: multiclass_final
+backbones: [medsam]
+runs: [1, 10]
+output_root: results/multiclass_v1
+common:
+  task: multiclass
+  label_column: combined_segmentation
+  label_values: [0, 127, 255]
+  base_seed: 1000
+  primary_criterion: dice
+  weight_form: paper
+arms: {}

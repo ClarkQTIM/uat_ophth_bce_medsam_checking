@@ -168,3 +168,10 @@ original FAZ split gone, these can no longer be settled from artifacts:
 - E15 (FAZ split): the published FAZ results cannot be re-run on their own test set.
 Not affected: E1 (confirmed by reproduction), E14 (confirmed from the surviving logs and by
 reproduction), and every re-run result, which rests only on surviving data and new runs.
+
+### K17. PAPILA per-rater masks carry a thin 127-valued line — OPEN (matters for the evidential track only)
+Checked 2026-10-27 on 3 images: `disc_exp*` and `cup_exp*` are mostly 0/255 binary masks
+with about 0.25% of pixels at 127, most likely the drawn contour on the boundary. The
+STAPLE map used by D21 is unaffected. Before the evidential track uses the per-rater masks,
+decide (and record) whether 127 counts as inside (> 0) or outside (≥ 128); the difference is
+about one pixel of boundary.
