@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from uatcheck.train_uat import arm_dir_name, run_dir_for, validate_config
+from uatcheck.train_uat import DEFAULTS, arm_dir_name, run_dir_for, validate_config
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
@@ -23,7 +23,7 @@ def test_job_counts(tmp_path, manifest, n):
     jobs = [json.loads(l) for l in open(out)]
     assert len(jobs) == n
     for j in jobs:
-        validate_config(j)
+        validate_config({**DEFAULTS, **j})   # as train_one_run does (older manifests omit newer keys)
 
 
 def test_arm_names_match_analysis_conventions():
