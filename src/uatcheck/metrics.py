@@ -88,3 +88,35 @@ class AUROCAccumulator:
             return float("nan")
         from sklearn.metrics import roc_auc_score
         return float(roc_auc_score(e, u))
+
+
+class CalibrationAccumulator:
+    """Pixel calibration of binary foreground probabilities over a split (DECISIONS D22).
+    ECE: 15 equal-width bins of confidence max(p, 1 - p) vs accuracy of the 0.5 threshold.
+    Brier: mean (p - y)^2. NLL: mean binary cross-entropy (p clamped to [1e-6, 1 - 1e-6])."""
+
+    def __init__(self, n_bins=15):
+        self.n_bins = n_bins
+        self.cnt = np.zeros(n_bins); self.conf = np.zeros(n_bins); self.acc = np.zeros(n_bins)
+        self.brier = 0.0; self.nll = 0.0; self.n = 0
+
+    def add(self, probabilities, ground_truth):
+        p = probabilities.detach().float().flatten()
+        y = ground_truth.detach().float().flatten()
+        conf = torch.maximum(p, 1 - p)
+        correct = ((p > 0.5).float() == y).float()
+        b = torch.clamp((conf - 0.5) / 0.5 * self.n_bins, max=self.n_bins - 1).long()  # conf in [0.5, 1]
+        self.cnt += torch.bincount(b, minlength=self.n_bins).cpu().numpy()
+        self.conf += torch.bincount(b, weights=conf, minlength=self.n_bins).cpu().numpy()
+        self.acc += torch.bincount(b, weights=correct, minlength=self.n_bins).cpu().numpy()
+        pc = p.clamp(1e-6, 1 - 1e-6)
+        self.brier += float(((p - y) ** 2).sum())
+        self.nll += float(-(y * pc.log() + (1 - y) * (1 - pc).log()).sum())
+        self.n += p.numel()
+
+    def compute(self):
+        if self.n == 0:
+            return {"ece": float("nan"), "brier": float("nan"), "nll": float("nan")}
+        m = self.cnt > 0
+        ece = float((np.abs(self.acc[m] - self.conf[m])).sum() / self.n)
+        return {"ece": ece, "brier": self.brier / self.n, "nll": self.nll / self.n}

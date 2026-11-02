@@ -1,0 +1,11 @@
+# Uncertainty-quality study (DECISIONS D22): GA and cup on the patient-level splits (D20),
+# FAZ on the seed-2026 split (D19; one eye per subject).
+ga:
+  csv: /scratch90/chris_/paper_crisis/data/ga_patient_split.csv
+  mask_max_value: 255
+cup:
+  csv: /scratch90/chris_/paper_crisis/data/cup_patient_split.csv
+  mask_max_value: 255
+octa:
+  csv: /scratch90/chris_/paper_crisis/data/octa_faz_split.csv
+  mask_max_value: 255

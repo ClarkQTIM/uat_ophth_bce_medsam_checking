@@ -231,3 +231,30 @@ copied from the paper's cells.
   baseline, Holm across the 2 UQ arms, paired by seed as supplementary). The claim "3-class UAT
   improves cup Dice" holds only if entropy or conformal beats the baseline with Holm P < 0.05
   under the validation-Dice rule.
+
+### D22. Does UAT improve the model's ability to flag its own errors? — fixed 2026-11-02, before any run
+The original motivation of the work: UAT might leave Dice unchanged but make the model's
+uncertainty better aligned with its errors. Not testable on existing runs (their saved test
+predictions come from the unweighted-BCE checkpoint, which for cup entropy is always a
+pre-UAT model), so it is tested with new runs that log uncertainty quality every epoch.
+- **Runs:** MedSAM; baseline, entropy and conformal with the paper's cells unchanged (GA γ5 W5 /
+  α0.25 γ4 W2; cup γ5 W5 / α0.20 γ2 W1; FAZ γ4 W2 / α0.05 γ1 W1); GA and cup on the patient-level
+  splits (D20), FAZ on the seed-2026 split (D19); 10 runs each (seeds 1001–1010) = 90 runs;
+  `configs/uq_quality/medsam_uq.yaml`, output `results/uq_quality_v1/`; all on one machine.
+- **Logged every epoch on the test set** (`track_uq_quality: true`): pixel error-detection AUROC
+  of the entropy of the model's own predicted probabilities (`test_err_auroc_entropy`; error =
+  0.5-thresholded prediction ≠ label; pooled, 20,000 pixels sampled per image, fixed seed); the
+  same AUROC for the arm's own U where it has one (`test_err_auroc_own_u`); pixel calibration:
+  ECE (15 bins of confidence), Brier, NLL.
+- **Primary question:** at the epoch selected by validation Dice (common rule, D17 Q3), is the
+  entropy AUROC higher for entropy-UAT than for the baseline? The same measure is used for every
+  arm, baseline included, so the comparison is about the model, not the uncertainty method.
+  Mann-Whitney, n = 10 vs 10, Holm across the 2 UQ arms within each dataset. **"UAT improves
+  error detection" holds for a dataset only if an arm's AUROC exceeds the baseline's with Holm
+  P < 0.05.** Secondary: ECE, Brier, NLL; the arm's own U; the other stopping rules; reported
+  for every dataset and arm whatever they show.
+- **Analysis:** `scripts/select_offline.py --root results/uq_quality_v1 --backbone medsam
+  --test_col test_err_auroc_entropy --suffix _auroc` (and `test_ece`, `test_brier`), plus Dice
+  as before. For ECE, Brier and NLL lower is better.
+- **Caveat stated in advance:** pixel AUROC depends on how many and which pixels are wrong, so
+  it is read alongside Dice; a model with very different accuracy is not directly comparable.

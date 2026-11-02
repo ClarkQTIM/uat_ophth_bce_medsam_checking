@@ -1,0 +1,27 @@
+# Does UAT make MedSAM better at flagging its own errors? (DECISIONS D22)
+# Baseline, entropy and conformal (the paper's cells, unchanged), 3 datasets, 10 runs = 90 runs.
+# Every epoch logs test error-detection AUROC and calibration, so every stopping rule
+# can be read off afterwards. Separate output root.
+name: uq_quality_medsam
+backbones: [medsam]
+runs: [1, 10]
+output_root: results/uq_quality_v1
+common:
+  weight_form: paper
+  val_weighting: none
+  track_all_criteria: true
+  track_uq_quality: true
+  save_test_tensors: false
+arms:
+  ga:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.25, gamma: 4, n_warmup: 2}
+  cup:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 5, n_warmup: 5}
+    - {uq_type: conformal, alpha: 0.20, gamma: 2, n_warmup: 1}
+  octa:
+    - {uq_type: none}
+    - {uq_type: entropy,   gamma: 4, n_warmup: 2}
+    - {uq_type: conformal, alpha: 0.05, gamma: 1, n_warmup: 1}

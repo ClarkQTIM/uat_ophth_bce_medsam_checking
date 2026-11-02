@@ -53,9 +53,9 @@ from .data import make_loaders
 from .forward import forward_probabilities, prepare_inputs
 from .losses import WeightedBCELoss
 from .manifest import update_manifest, write_manifest
-from .metrics import (AUROCAccumulator, hard_dice_per_image, iou_per_image,
+from .metrics import (AUROCAccumulator, CalibrationAccumulator, hard_dice_per_image, iou_per_image,
                       soft_dice_per_image, uq_error_dice)
-from .uncertainty import uncertainty_map
+from .uncertainty import entropy_map, uncertainty_map
 
 LOSS_DIR = {"paper": "weighted_bce_v2", "gm1": "weighted_bce_v2_gm1",
             "exp": "weighted_bce_v2_exp"}
@@ -81,6 +81,7 @@ DEFAULTS = {
     "clip_conformal_level": False,          # D6
     "val_weighting": "none",                # D16: "none" (paper text) | "paper_era" (as run)
     "track_all_criteria": True,             # D16: run until all criteria stop; test every epoch
+    "track_uq_quality": False,              # D22: per-epoch test error-detection AUROC + calibration
     # --- training (paper Methods) ---
     "num_epochs": 40,
     "patience": 5,
@@ -257,15 +258,31 @@ def train_one_run(cfg_in):
 
         # ---------------- test every epoch (offline selection) ----------------
         te_soft, te_hard = float("nan"), float("nan")
+        uqq = {}
         if cfg["track_all_criteria"]:
+            track_q = cfg["track_uq_quality"]
+            auc_ent, auc_own, calib = AUROCAccumulator(seed=0), AUROCAccumulator(seed=0), CalibrationAccumulator()
             with torch.no_grad():
                 ts, th = [], []
                 for inputs, seg in test_loader:
-                    probs, _ = fwd(inputs)
+                    probs, var_map = fwd(inputs)
                     seg = seg.to(device)
                     ts.extend(soft_dice_per_image(probs, seg)[:, 0].tolist())
                     th.extend(hard_dice_per_image(probs, seg)[:, 0].tolist())
+                    if track_q:
+                        # D22: the SAME measure for every arm, baseline included: entropy of the
+                        # model's own predicted probabilities; plus the arm's own U where it has one
+                        auc_ent.add(probs, seg, entropy_map(probs))
+                        own = uncertainty_map(uq, probs, var_map, qhat, cfg["entropy_normalize"])
+                        if own is not None:
+                            auc_own.add(probs, seg, own)
+                        calib.add(probs, seg)
             te_soft, te_hard = float(np.mean(ts)), float(np.mean(th))
+            if track_q:
+                c = calib.compute()
+                uqq = {"test_err_auroc_entropy": auc_ent.compute(),
+                       "test_err_auroc_own_u": auc_own.compute(),
+                       "test_ece": c["ece"], "test_brier": c["brier"], "test_nll": c["nll"]}
 
         row = {
             "epoch": epoch + 1, "loss_type": loss_name, "uncertainty_type": uq,
@@ -276,7 +293,7 @@ def train_one_run(cfg_in):
             "val_uq_error_dice": va_uqd,
             "val_uncertainty": float(np.mean(va_u)) if va_u else float("nan"),
             "val_soft_dice": va_dice_mean,
-            "test_soft_dice": te_soft, "test_hard_dice": te_hard,
+            "test_soft_dice": te_soft, "test_hard_dice": te_hard, **uqq,
             "seconds": round(time.time() - t0, 1),
             "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1024 ** 3, 2)
                            if torch.cuda.is_available() else float("nan"),
