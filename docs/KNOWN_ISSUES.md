@@ -175,3 +175,12 @@ with about 0.25% of pixels at 127, most likely the drawn contour on the boundary
 STAPLE map used by D21 is unaffected. Before the evidential track uses the per-rater masks,
 decide (and record) whether 127 counts as inside (> 0) or outside (≥ 128); the difference is
 about one pixel of boundary.
+
+### K18. Run-to-run variability: identical configurations can land on either side of P = 0.05 — RECORDED 2026-11-03
+The D22 runs repeat the D20 (GA, cup) and FAZ MedSAM cells with the same splits, seeds and
+hardware; only extra logging differs, so differences come from GPU non-determinism. Entropy vs
+baseline, validation-Dice rule: GA +0.026 (P = 0.064) → +0.037 (P = 0.009); FAZ +0.009
+(P = 0.006) → +0.004 (P = 0.12); cup +0.017 (P = 0.12) → +0.008 (P = 0.43). The direction
+repeats, the significance does not. Consequence: effects of this size (≈ 0.005–0.04 Dice) are
+not reliably detected with 10 runs per arm; claims should rest on effect sizes and replication,
+not on single P values near 0.05.

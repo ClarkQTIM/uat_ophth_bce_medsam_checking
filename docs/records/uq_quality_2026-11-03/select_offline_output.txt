@@ -1,0 +1,294 @@
+################ test_err_auroc_entropy
+dataset=cup backbone=medsam patience=5 outcome=test_err_auroc_entropy
+
+[as_run] baseline n=10 mean 0.9465
+
+[unweighted] baseline n=10 mean 0.9465
+  conformal_lac_020  g=2 W=1: n=10 mean 0.9475 (+0.0010) P=0.273 Holm=0.483 epochs=11.4 | paired(10) +0.0010 P=0.492
+  entropy            g=5 W=5: n=10 mean 0.9425 (-0.0040) P=0.241 Holm=0.483 epochs=7.9 | paired(10) -0.0040 P=0.275
+
+[weighted] baseline n=10 mean 0.9465
+  conformal_lac_020  g=2 W=1: n=10 mean 0.9455 (-0.0009) P=0.473 Holm=0.473 epochs=11.5 | paired(10) -0.0009 P=0.695
+  entropy            g=5 W=5: n=10 mean 0.9304 (-0.0160) P=0.000769 Holm=0.00154 epochs=14.3 | paired(10) -0.0160 P=0.00586
+
+[dice] baseline n=10 mean 0.9497
+  conformal_lac_020  g=2 W=1: n=10 mean 0.9484 (-0.0013) P=0.162 Holm=0.162 epochs=23.7 | paired(10) -0.0013 P=0.131
+  entropy            g=5 W=5: n=10 mean 0.9304 (-0.0193) P=0.00033 Holm=0.00066 epochs=14.9 | paired(10) -0.0193 P=0.00195
+
+dataset=ga backbone=medsam patience=5 outcome=test_err_auroc_entropy
+
+[as_run] baseline n=10 mean 0.9439
+
+[unweighted] baseline n=10 mean 0.9439
+  conformal_lac_025  g=4 W=2: n=10 mean 0.9419 (-0.0020) P=0.521 Holm=0.689 epochs=21.9 | paired(10) -0.0020 P=0.695
+  entropy            g=5 W=5: n=10 mean 0.9367 (-0.0072) P=0.345 Holm=0.689 epochs=15.7 | paired(10) -0.0072 P=0.275
+
+[weighted] baseline n=10 mean 0.9439
+  conformal_lac_025  g=4 W=2: n=10 mean 0.9453 (+0.0014) P=0.91 Holm=0.945 epochs=26.8 | paired(10) +0.0014 P=1
+  entropy            g=5 W=5: n=10 mean 0.9381 (-0.0058) P=0.473 Holm=0.945 epochs=19.3 | paired(10) -0.0058 P=0.375
+
+[dice] baseline n=10 mean 0.9434
+  conformal_lac_025  g=4 W=2: n=10 mean 0.9381 (-0.0054) P=0.734 Holm=1 epochs=32.0 | paired(10) -0.0054 P=0.846
+  entropy            g=5 W=5: n=10 mean 0.9391 (-0.0043) P=0.623 Holm=1 epochs=19.1 | paired(10) -0.0043 P=0.232
+
+dataset=octa backbone=medsam patience=5 outcome=test_err_auroc_entropy
+
+[as_run] baseline n=10 mean 0.9944
+
+[unweighted] baseline n=10 mean 0.9944
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9946 (+0.0002) P=0.91 Holm=0.91 epochs=20.0 | paired(10) +0.0002 P=0.557
+  entropy            g=4 W=2: n=10 mean 0.9881 (-0.0064) P=0.0058 Holm=0.0116 epochs=14.5 | paired(10) -0.0064 P=0.00195
+
+[weighted] baseline n=10 mean 0.9944
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9947 (+0.0002) P=0.97 Holm=0.97 epochs=20.6 | paired(10) +0.0002 P=0.625
+  entropy            g=4 W=2: n=10 mean 0.9872 (-0.0072) P=0.000583 Holm=0.00117 epochs=19.9 | paired(10) -0.0072 P=0.00195
+
+[dice] baseline n=10 mean 0.9807
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9844 (+0.0037) P=0.427 Holm=0.855 epochs=32.2 | paired(10) +0.0037 P=0.492
+  entropy            g=4 W=2: n=10 mean 0.9851 (+0.0044) P=1 Holm=1 epochs=24.8 | paired(10) +0.0044 P=0.846
+
+################ test_ece
+dataset=cup backbone=medsam patience=5 outcome=test_ece
+
+[as_run] baseline n=10 mean 0.0089
+
+[unweighted] baseline n=10 mean 0.0089
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0108 (+0.0019) P=0.14 Holm=0.208 epochs=11.4 | paired(10) +0.0019 P=0.232
+  entropy            g=5 W=5: n=10 mean 0.0071 (-0.0018) P=0.104 Holm=0.208 epochs=7.9 | paired(10) -0.0018 P=0.16
+
+[weighted] baseline n=10 mean 0.0089
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0111 (+0.0023) P=0.0539 Holm=0.0539 epochs=11.5 | paired(10) +0.0023 P=0.16
+  entropy            g=5 W=5: n=10 mean 0.0283 (+0.0194) P=0.000183 Holm=0.000365 epochs=14.3 | paired(10) +0.0194 P=0.00195
+
+[dice] baseline n=10 mean 0.0192
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0208 (+0.0016) P=0.385 Holm=0.385 epochs=23.7 | paired(10) +0.0016 P=0.375
+  entropy            g=5 W=5: n=10 mean 0.0284 (+0.0092) P=0.000769 Holm=0.00154 epochs=14.9 | paired(10) +0.0092 P=0.00195
+
+dataset=ga backbone=medsam patience=5 outcome=test_ece
+
+[as_run] baseline n=10 mean 0.0104
+
+[unweighted] baseline n=10 mean 0.0104
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0097 (-0.0007) P=0.521 Holm=0.521 epochs=21.9 | paired(10) -0.0007 P=0.77
+  entropy            g=5 W=5: n=10 mean 0.0168 (+0.0064) P=0.000583 Holm=0.00117 epochs=15.7 | paired(10) +0.0064 P=0.00195
+
+[weighted] baseline n=10 mean 0.0104
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0101 (-0.0003) P=0.623 Holm=0.623 epochs=26.8 | paired(10) -0.0003 P=1
+  entropy            g=5 W=5: n=10 mean 0.0162 (+0.0058) P=0.000583 Holm=0.00117 epochs=19.3 | paired(10) +0.0058 P=0.00195
+
+[dice] baseline n=10 mean 0.0129
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0134 (+0.0005) P=0.345 Holm=0.345 epochs=32.0 | paired(10) +0.0005 P=0.275
+  entropy            g=5 W=5: n=10 mean 0.0171 (+0.0042) P=0.000769 Holm=0.00154 epochs=19.1 | paired(10) +0.0042 P=0.00195
+
+dataset=octa backbone=medsam patience=5 outcome=test_ece
+
+[as_run] baseline n=10 mean 0.0009
+
+[unweighted] baseline n=10 mean 0.0009
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0008 (-0.0001) P=0.0757 Holm=0.0757 epochs=20.0 | paired(10) -0.0001 P=0.0371
+  entropy            g=4 W=2: n=10 mean 0.0012 (+0.0003) P=0.000583 Holm=0.00117 epochs=14.5 | paired(10) +0.0003 P=0.00195
+
+[weighted] baseline n=10 mean 0.0009
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0009 (-0.0001) P=0.273 Holm=0.273 epochs=20.6 | paired(10) -0.0001 P=0.322
+  entropy            g=4 W=2: n=10 mean 0.0013 (+0.0004) P=0.000183 Holm=0.000365 epochs=19.9 | paired(10) +0.0004 P=0.00195
+
+[dice] baseline n=10 mean 0.0012
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0012 (+0.0000) P=0.85 Holm=0.85 epochs=32.2 | paired(10) +0.0000 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.0014 (+0.0001) P=0.0173 Holm=0.0345 epochs=24.8 | paired(10) +0.0001 P=0.0137
+
+################ test_brier
+dataset=cup backbone=medsam patience=5 outcome=test_brier
+
+[as_run] baseline n=10 mean 0.0298
+
+[unweighted] baseline n=10 mean 0.0298
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0287 (-0.0011) P=0.241 Holm=0.483 epochs=11.4 | paired(10) -0.0011 P=0.232
+  entropy            g=5 W=5: n=10 mean 0.0313 (+0.0015) P=0.385 Holm=0.483 epochs=7.9 | paired(10) +0.0015 P=0.77
+
+[weighted] baseline n=10 mean 0.0298
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0299 (+0.0001) P=0.623 Holm=0.623 epochs=11.5 | paired(10) +0.0001 P=0.77
+  entropy            g=5 W=5: n=10 mean 0.0328 (+0.0030) P=0.00728 Holm=0.0146 epochs=14.3 | paired(10) +0.0030 P=0.00391
+
+[dice] baseline n=10 mean 0.0293
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0301 (+0.0009) P=0.0757 Holm=0.0757 epochs=23.7 | paired(10) +0.0009 P=0.131
+  entropy            g=5 W=5: n=10 mean 0.0333 (+0.0040) P=0.00171 Holm=0.00341 epochs=14.9 | paired(10) +0.0040 P=0.00391
+
+dataset=ga backbone=medsam patience=5 outcome=test_brier
+
+[as_run] baseline n=10 mean 0.0225
+
+[unweighted] baseline n=10 mean 0.0225
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0202 (-0.0023) P=0.385 Holm=0.769 epochs=21.9 | paired(10) -0.0023 P=0.16
+  entropy            g=5 W=5: n=10 mean 0.0220 (-0.0005) P=0.791 Holm=0.791 epochs=15.7 | paired(10) -0.0005 P=0.922
+
+[weighted] baseline n=10 mean 0.0225
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0195 (-0.0030) P=0.121 Holm=0.242 epochs=26.8 | paired(10) -0.0030 P=0.0371
+  entropy            g=5 W=5: n=10 mean 0.0208 (-0.0017) P=0.791 Holm=0.791 epochs=19.3 | paired(10) -0.0017 P=0.322
+
+[dice] baseline n=10 mean 0.0220
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0207 (-0.0013) P=0.0257 Holm=0.0515 epochs=32.0 | paired(10) -0.0013 P=0.131
+  entropy            g=5 W=5: n=10 mean 0.0211 (-0.0009) P=0.345 Holm=0.345 epochs=19.1 | paired(10) -0.0009 P=0.432
+
+dataset=octa backbone=medsam patience=5 outcome=test_brier
+
+[as_run] baseline n=10 mean 0.0016
+
+[unweighted] baseline n=10 mean 0.0016
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0015 (-0.0000) P=0.473 Holm=0.473 epochs=20.0 | paired(10) -0.0000 P=0.375
+  entropy            g=4 W=2: n=10 mean 0.0017 (+0.0001) P=0.121 Holm=0.242 epochs=14.5 | paired(10) +0.0001 P=0.0645
+
+[weighted] baseline n=10 mean 0.0016
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0015 (-0.0000) P=0.385 Holm=0.615 epochs=20.6 | paired(10) -0.0000 P=0.375
+  entropy            g=4 W=2: n=10 mean 0.0016 (+0.0001) P=0.307 Holm=0.615 epochs=19.9 | paired(10) +0.0001 P=0.375
+
+[dice] baseline n=10 mean 0.0016
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0016 (-0.0000) P=0.734 Holm=0.855 epochs=32.2 | paired(10) -0.0000 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.0016 (+0.0000) P=0.427 Holm=0.855 epochs=24.8 | paired(10) +0.0000 P=0.375
+
+################ test_nll
+dataset=cup backbone=medsam patience=5 outcome=test_nll
+
+[as_run] baseline n=10 mean 0.1008
+
+[unweighted] baseline n=10 mean 0.1008
+  conformal_lac_020  g=2 W=1: n=10 mean 0.0990 (-0.0018) P=0.623 Holm=0.945 epochs=11.4 | paired(10) -0.0018 P=0.492
+  entropy            g=5 W=5: n=10 mean 0.1055 (+0.0047) P=0.473 Holm=0.945 epochs=7.9 | paired(10) +0.0047 P=0.846
+
+[weighted] baseline n=10 mean 0.1008
+  conformal_lac_020  g=2 W=1: n=10 mean 0.1025 (+0.0017) P=0.91 Holm=0.91 epochs=11.5 | paired(10) +0.0017 P=0.846
+  entropy            g=5 W=5: n=10 mean 0.1489 (+0.0481) P=0.000183 Holm=0.000365 epochs=14.3 | paired(10) +0.0481 P=0.00195
+
+[dice] baseline n=10 mean 0.1175
+  conformal_lac_020  g=2 W=1: n=10 mean 0.1248 (+0.0073) P=0.241 Holm=0.241 epochs=23.7 | paired(10) +0.0073 P=0.275
+  entropy            g=5 W=5: n=10 mean 0.1522 (+0.0346) P=0.0022 Holm=0.0044 epochs=14.9 | paired(10) +0.0346 P=0.00195
+
+dataset=ga backbone=medsam patience=5 outcome=test_nll
+
+[as_run] baseline n=10 mean 0.0845
+
+[unweighted] baseline n=10 mean 0.0845
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0783 (-0.0063) P=0.571 Holm=0.571 epochs=21.9 | paired(10) -0.0063 P=0.375
+  entropy            g=5 W=5: n=10 mean 0.1000 (+0.0154) P=0.0113 Holm=0.0227 epochs=15.7 | paired(10) +0.0154 P=0.0137
+
+[weighted] baseline n=10 mean 0.0845
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0764 (-0.0081) P=0.427 Holm=0.427 epochs=26.8 | paired(10) -0.0081 P=0.193
+  entropy            g=5 W=5: n=10 mean 0.0978 (+0.0133) P=0.014 Holm=0.028 epochs=19.3 | paired(10) +0.0133 P=0.0137
+
+[dice] baseline n=10 mean 0.0863
+  conformal_lac_025  g=4 W=2: n=10 mean 0.0906 (+0.0044) P=0.345 Holm=0.345 epochs=32.0 | paired(10) +0.0044 P=0.322
+  entropy            g=5 W=5: n=10 mean 0.1022 (+0.0160) P=0.0058 Holm=0.0116 epochs=19.1 | paired(10) +0.0160 P=0.00195
+
+dataset=octa backbone=medsam patience=5 outcome=test_nll
+
+[as_run] baseline n=10 mean 0.0067
+
+[unweighted] baseline n=10 mean 0.0067
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0063 (-0.0004) P=0.345 Holm=0.345 epochs=20.0 | paired(10) -0.0004 P=0.625
+  entropy            g=4 W=2: n=10 mean 0.0074 (+0.0007) P=0.0539 Holm=0.108 epochs=14.5 | paired(10) +0.0007 P=0.00586
+
+[weighted] baseline n=10 mean 0.0067
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0064 (-0.0003) P=0.521 Holm=0.521 epochs=20.6 | paired(10) -0.0003 P=1
+  entropy            g=4 W=2: n=10 mean 0.0082 (+0.0015) P=0.0022 Holm=0.0044 epochs=19.9 | paired(10) +0.0015 P=0.00977
+
+[dice] baseline n=10 mean 0.0089
+  conformal_lac_005  g=1 W=1: n=10 mean 0.0088 (-0.0002) P=0.97 Holm=1 epochs=32.2 | paired(10) -0.0002 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.0091 (+0.0001) P=0.85 Holm=1 epochs=24.8 | paired(10) +0.0001 P=0.492
+
+################ test_err_auroc_own_u
+dataset=cup backbone=medsam patience=5 outcome=test_err_auroc_own_u
+
+[as_run] baseline n=10 mean nan
+
+[unweighted] baseline n=10 mean nan
+  conformal_lac_020  g=2 W=1: n=10 mean 0.5530 (+nan) P=nan Holm=nan epochs=11.4
+  entropy            g=5 W=5: n=10 mean 0.9425 (+nan) P=nan Holm=nan epochs=7.9
+
+[weighted] baseline n=10 mean nan
+  conformal_lac_020  g=2 W=1: n=10 mean 0.5295 (+nan) P=nan Holm=nan epochs=11.5
+  entropy            g=5 W=5: n=10 mean 0.9304 (+nan) P=nan Holm=nan epochs=14.3
+
+[dice] baseline n=10 mean nan
+  conformal_lac_020  g=2 W=1: n=10 mean 0.5269 (+nan) P=nan Holm=nan epochs=23.7
+  entropy            g=5 W=5: n=10 mean 0.9304 (+nan) P=nan Holm=nan epochs=14.9
+
+dataset=ga backbone=medsam patience=5 outcome=test_err_auroc_own_u
+
+[as_run] baseline n=10 mean nan
+
+[unweighted] baseline n=10 mean nan
+  conformal_lac_025  g=4 W=2: n=10 mean 0.5261 (+nan) P=nan Holm=nan epochs=21.9
+  entropy            g=5 W=5: n=10 mean 0.9367 (+nan) P=nan Holm=nan epochs=15.7
+
+[weighted] baseline n=10 mean nan
+  conformal_lac_025  g=4 W=2: n=10 mean 0.5219 (+nan) P=nan Holm=nan epochs=26.8
+  entropy            g=5 W=5: n=10 mean 0.9381 (+nan) P=nan Holm=nan epochs=19.3
+
+[dice] baseline n=10 mean nan
+  conformal_lac_025  g=4 W=2: n=10 mean 0.5231 (+nan) P=nan Holm=nan epochs=32.0
+  entropy            g=5 W=5: n=10 mean 0.9391 (+nan) P=nan Holm=nan epochs=19.1
+
+dataset=octa backbone=medsam patience=5 outcome=test_err_auroc_own_u
+
+[as_run] baseline n=10 mean nan
+
+[unweighted] baseline n=10 mean nan
+  conformal_lac_005  g=1 W=1: n=10 mean 0.6616 (+nan) P=nan Holm=nan epochs=20.0
+  entropy            g=4 W=2: n=10 mean 0.9881 (+nan) P=nan Holm=nan epochs=14.5
+
+[weighted] baseline n=10 mean nan
+  conformal_lac_005  g=1 W=1: n=10 mean 0.6537 (+nan) P=nan Holm=nan epochs=20.6
+  entropy            g=4 W=2: n=10 mean 0.9872 (+nan) P=nan Holm=nan epochs=19.9
+
+[dice] baseline n=10 mean nan
+  conformal_lac_005  g=1 W=1: n=10 mean 0.6406 (+nan) P=nan Holm=nan epochs=32.2
+  entropy            g=4 W=2: n=10 mean 0.9851 (+nan) P=nan Holm=nan epochs=24.8
+
+################ test_soft_dice
+dataset=cup backbone=medsam patience=5 outcome=test_soft_dice
+
+[as_run] baseline n=10 mean 0.6889
+
+[unweighted] baseline n=10 mean 0.6889
+  conformal_lac_020  g=2 W=1: n=10 mean 0.7083 (+0.0194) P=0.064 Holm=0.128 epochs=11.4 | paired(10) +0.0194 P=0.0645
+  entropy            g=5 W=5: n=10 mean 0.6698 (-0.0191) P=0.104 Holm=0.128 epochs=7.9 | paired(10) -0.0191 P=0.193
+
+[weighted] baseline n=10 mean 0.6889
+  conformal_lac_020  g=2 W=1: n=10 mean 0.7018 (+0.0129) P=0.089 Holm=0.089 epochs=11.5 | paired(10) +0.0129 P=0.375
+  entropy            g=5 W=5: n=10 mean 0.7561 (+0.0672) P=0.000183 Holm=0.000365 epochs=14.3 | paired(10) +0.0672 P=0.00195
+
+[dice] baseline n=10 mean 0.7503
+  conformal_lac_020  g=2 W=1: n=10 mean 0.7494 (-0.0010) P=0.97 Holm=0.97 epochs=23.7 | paired(10) -0.0010 P=1
+  entropy            g=5 W=5: n=10 mean 0.7579 (+0.0075) P=0.427 Holm=0.855 epochs=14.9 | paired(10) +0.0075 P=0.492
+
+dataset=ga backbone=medsam patience=5 outcome=test_soft_dice
+
+[as_run] baseline n=10 mean 0.7680
+
+[unweighted] baseline n=10 mean 0.7680
+  conformal_lac_025  g=4 W=2: n=10 mean 0.7883 (+0.0203) P=0.473 Holm=0.473 epochs=21.9 | paired(10) +0.0203 P=0.084
+  entropy            g=5 W=5: n=10 mean 0.8123 (+0.0443) P=0.064 Holm=0.128 epochs=15.7 | paired(10) +0.0443 P=0.0371
+
+[weighted] baseline n=10 mean 0.7680
+  conformal_lac_025  g=4 W=2: n=10 mean 0.7992 (+0.0312) P=0.186 Holm=0.186 epochs=26.8 | paired(10) +0.0312 P=0.00977
+  entropy            g=5 W=5: n=10 mean 0.8228 (+0.0549) P=0.0257 Holm=0.0515 epochs=19.3 | paired(10) +0.0549 P=0.00977
+
+[dice] baseline n=10 mean 0.7872
+  conformal_lac_025  g=4 W=2: n=10 mean 0.8096 (+0.0223) P=0.0539 Holm=0.0539 epochs=32.0 | paired(10) +0.0223 P=0.0645
+  entropy            g=5 W=5: n=10 mean 0.8238 (+0.0366) P=0.00911 Holm=0.0182 epochs=19.1 | paired(10) +0.0366 P=0.0195
+
+dataset=octa backbone=medsam patience=5 outcome=test_soft_dice
+
+[as_run] baseline n=10 mean 0.9024
+
+[unweighted] baseline n=10 mean 0.9024
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9002 (-0.0023) P=0.473 Holm=0.945 epochs=20.0 | paired(10) -0.0023 P=0.275
+  entropy            g=4 W=2: n=10 mean 0.9036 (+0.0012) P=0.473 Holm=0.945 epochs=14.5 | paired(10) +0.0012 P=0.625
+
+[weighted] baseline n=10 mean 0.9024
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9023 (-0.0001) P=1 Holm=1 epochs=20.6 | paired(10) -0.0001 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.9149 (+0.0125) P=0.00101 Holm=0.00202 epochs=19.9 | paired(10) +0.0125 P=0.00391
+
+[dice] baseline n=10 mean 0.9146
+  conformal_lac_005  g=1 W=1: n=10 mean 0.9142 (-0.0004) P=0.85 Holm=0.85 epochs=32.2 | paired(10) -0.0004 P=0.922
+  entropy            g=4 W=2: n=10 mean 0.9188 (+0.0042) P=0.121 Holm=0.242 epochs=24.8 | paired(10) +0.0042 P=0.0273
+
